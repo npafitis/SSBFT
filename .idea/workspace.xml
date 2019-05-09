@@ -5,7 +5,9 @@
     <bookmark url="file://$PROJECT_DIR$/types/request.go" line="196" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5c5ff8f8-300f-41d5-adac-1fdbb0ed5311" name="Default Changelist" comment="" />
+    <list default="true" id="5c5ff8f8-300f-41d5-adac-1fdbb0ed5311" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,11 +48,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/replication.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="224">
-              <caret line="107" column="32" selection-start-line="107" selection-start-column="32" selection-end-line="107" selection-end-column="32" />
+              <caret line="107" column="34" selection-start-line="107" selection-start-column="34" selection-end-line="107" selection-end-column="34" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="6" selection-start-column="6" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -128,7 +139,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/common/message/message.go" />
         <option value="$PROJECT_DIR$/monitor/faildetect.go" />
         <option value="$PROJECT_DIR$/replication/replication.go" />
         <option value="$PROJECT_DIR$/view/establishment.go" />
@@ -179,6 +189,7 @@
         <option value="$PROJECT_DIR$/types/request.go" />
         <option value="$PROJECT_DIR$/app/messenger/messenger.go" />
         <option value="$PROJECT_DIR$/app/replication.go" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -207,16 +218,6 @@
             <path>
               <item name="SSBFT" type="b2602c69:ProjectViewProjectNode" />
               <item name="SSBFT" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SSBFT" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SSBFT" type="462c0819:PsiDirectoryNode" />
-              <item name="helper" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SSBFT" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SSBFT" type="462c0819:PsiDirectoryNode" />
-              <item name="variables" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -356,8 +357,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="64" y="-11" width="1303" height="780" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.30996016" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.30996016" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -370,7 +372,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.4996016" visible="true" weight="0.44245142" />
+      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.4996016" visible="true" weight="0.44245142" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.5003984" side_tool="true" weight="0.46199703" />
       <window_info anchor="bottom" id="Inspection Results" order="12" weight="0.32935917" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -405,7 +407,6 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/common/context.go" />
     <entry file="file://$PROJECT_DIR$/common/vcm/vstatus/vstatus.go" />
     <entry file="file://$PROJECT_DIR$/../github.com/pebbe/zmq4/draft/zmq4.go">
       <provider selected="true" editor-type-id="text-editor">
@@ -713,7 +714,14 @@
     <entry file="file://$PROJECT_DIR$/app/replication.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="224">
-          <caret line="107" column="32" selection-start-line="107" selection-start-column="32" selection-end-line="107" selection-end-column="32" />
+          <caret line="107" column="34" selection-start-line="107" selection-start-column="34" selection-end-line="107" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="6" selection-start-column="6" selection-end-column="6" />
         </state>
       </provider>
     </entry>
