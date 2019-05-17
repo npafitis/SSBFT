@@ -2,11 +2,11 @@ package app
 
 import (
 	"SSBFT/app/messenger"
+	"SSBFT/logger"
 	"SSBFT/types"
 	"SSBFT/variables"
 	"container/list"
 	"errors"
-	"log"
 	"math"
 	"reflect"
 	"time"
@@ -15,7 +15,7 @@ import (
 /**
 Constants
 */
-var MAXINT int
+var MAXINT uint64
 /*****************/
 // Identifier(i) of processor p[i]
 //var types.Id int
@@ -43,13 +43,16 @@ Interface for BFT
 
 func InitializeReplication() {
 	rep = make([]*types.ReplicaStructure, variables.N)
-	for i:= range rep{
+	for i := range rep {
 		rep[i] = new(types.ReplicaStructure)
 		replica := DEF_STATE()
 		rep[i] = replica
 	}
 	Sigma = 1
-	MAXINT = int(math.Pow(2, 64))
+	MAXINT = uint64(math.Pow(2, 64))
+	logger.OutLogger.Println("MaxInt =", MAXINT)
+	needFlush = false
+	flush = false
 }
 
 func GetPendReqs() (set []*types.Request, err error) {
@@ -92,16 +95,31 @@ does not exist (indicated as nil); It produces dummy requests in the case where
 at least 3f + 1 processors appear to have committed a sufficient number of requests
 but they have no evidence of a previous request exists or is assigned. This request
 is blocking the execution of the requests that follow.
-
 */
 func findConsState(S []types.RepState) struct {
 	RepState types.RepState
 	Rlog     []*types.LogTuple
 } {
-	return struct {
+	var consState = struct {
 		RepState types.RepState
 		Rlog     []*types.LogTuple
 	}{RepState: nil, Rlog: nil}
+	if len(S) == 0 {
+		consState.RepState = make([]rune, 0)
+	} else {
+		state := S[0]
+		for i := range S {
+			state = state.GetCommonPrefix(S[i])
+		}
+		consState.RepState = state
+	}
+	logs := types.RLog(rep[0].RLog)
+	for i := range rep {
+		logs = logs.CommonPrefix(rep[i].RLog)
+	}
+	consState.Rlog = logs
+
+	return consState
 }
 
 /**
@@ -112,7 +130,12 @@ processors are verified by another 3f+1 processors and the new state has a corre
 prefix as per findConsState().
 */
 func checkNewVState(id int) bool {
-	return false
+	consState := findConsState(comPrefStates(3*variables.F + 1))
+	if !consState.RepState.PrefixRelation(rep[id].RepState) {
+		return false
+	}
+
+	return true
 }
 
 /**
@@ -122,14 +145,40 @@ of pending requests messages for reqQ and pendReqs, where these are now allocate
 to the new view.
 */
 func renewReqs() {
+	pendReqs := list.New()
+	reqQ := list.New()
+	for e := rep[variables.Id].PendReqs.Front(); e != nil; e = e.Next() {
+		req := e.Value.(*types.Request)
+		count := 0
+		for i := range rep {
+			if types.PendReqsContains(rep[i].PendReqs, req) {
+				count++
+			}
+		}
+		if count >= 3*variables.F+1 {
+			pendReqs.PushBack(req)
+		}
+	}
+	for e := rep[variables.Id].ReqQ.Front(); e != nil; e = e.Next() {
+		rs := e.Value.(*types.RequestStatus)
+		count := 0
+		for i := range rep {
+			if types.ReqQContains(rep[i].ReqQ, rs) {
+				count++
+			}
+		}
+		if count >= 3*variables.F+1 {
+			reqQ.PushBack(rs)
+		}
+	}
 }
 
-// TODO apply(x)
 func apply(x *types.Request) *types.Reply {
 	reply := new(types.Reply)
 	switch x.Operation.Op {
 	case types.ADD:
 		rep[variables.Id].RepState = append(rep[variables.Id].RepState, x.Operation.Value)
+		logger.OutLogger.Println(rep[variables.Id].RepState)
 		reply.TimeStamp = time.Now()
 		reply.Id = variables.Id
 		reply.Result = rep[variables.Id].RepState
@@ -145,6 +194,7 @@ func apply(x *types.Request) *types.Reply {
 flushLocal() resets all local values of rep[].
 */
 func flushLocal() {
+	logger.OutLogger.Println("Flushed Local.")
 	seqn = 0
 	for i := 0; i < variables.N; i++ {
 		rep[i] = DEF_STATE()
@@ -230,7 +280,7 @@ Returns True if 4f + 1 processors report to have their conflict flag conFlag = T
 func conflict() bool {
 	count := 0
 	for _, rs := range rep {
-		if rs.ConFlag {
+		if rs.ConFlag == true {
 			count++
 		}
 	}
@@ -246,10 +296,21 @@ at least d processors. If no such exists then it returns nil.
 */
 func comPrefStates(d int) []types.RepState {
 	var states []types.RepState
+
 	for i := range rep {
 		states = make([]types.RepState, 0)
+		states = append(states, rep[i].RepState)
 		for j := range rep {
-			if rep[i].RepState.PrefixRelation(rep[j].RepState) {
+			if j == i {
+				continue
+			}
+			flag := true
+			for _, state := range states {
+				if !rep[j].RepState.PrefixRelation(state) {
+					flag = false
+				}
+			}
+			if flag {
 				states = append(states, rep[j].RepState)
 			}
 		}
@@ -257,6 +318,17 @@ func comPrefStates(d int) []types.RepState {
 			return states
 		}
 	}
+	//for i := range rep {
+	//	states = make([]types.RepState, 0)
+	//	for j := range rep {
+	//		if rep[i].RepState.PrefixRelation(rep[j].RepState) {
+	//			states = append(states, rep[j].RepState)
+	//		}
+	//	}
+	//	if len(states) >= d {
+	//		return states
+	//	}
+	//}
 	return make([]types.RepState, 0)
 }
 
@@ -319,7 +391,7 @@ staleReqSeqn() returns True if the sequence number has reached the maximal count
 value MAXINT
 */
 func staleReqSeqn() bool {
-	if (lastExec() + Sigma*variables.K) > MAXINT {
+	if (uint64(lastExec() + Sigma*variables.K)) > MAXINT {
 		return true
 	}
 	return false
@@ -329,25 +401,25 @@ func staleReqSeqn() bool {
 unsupReq()  returns True if a request exists in reqQ
 less than 2f+1 times.
 */
-func unsupReq() bool {
-	if rep[variables.Id].ReqQ.Len() == 0 {
-		return false
-	}
-	for e := rep[variables.Id].ReqQ.Front(); e != nil; e = e.Next() {
-		item := e.Value.(*types.AcceptedRequest)
-		count := 0
-		for _, rs := range rep {
-			reqs := rs.ReqQ
-			for el := reqs.Front(); el != nil; el = el.Next() {
-				req := el.Value.(*types.AcceptedRequest)
-				if item.Equals(req) {
-					count++
-				}
-			}
-		}
-	}
-	return false
-}
+//func unsupReq() bool {
+//	if rep[variables.Id].ReqQ.Len() == 0 {
+//		return false
+//	}
+//	for e := rep[variables.Id].ReqQ.Front(); e != nil; e = e.Next() {
+//		item := e.Value.(*types.RequestStatus)
+//		count := 0
+//		for _, rs := range rep {
+//			reqs := rs.ReqQ
+//			for el := reqs.Front(); el != nil; el = el.Next() {
+//				req := el.Value.(*types.AcceptedRequest)
+//				if item.Equals(req) {
+//					count++
+//				}
+//			}
+//		}
+//	}
+//	return false
+//}
 
 /**
 staleRep() returns True if any of double(), unsupReq()
@@ -357,9 +429,9 @@ func staleRep() bool {
 	if staleReqSeqn() {
 		return true
 	}
-	if unsupReq() {
-		return true
-	}
+	//if unsupReq() {
+	//	return true
+	//}
 	if double() {
 		return true
 	}
@@ -373,7 +445,7 @@ func staleRep() bool {
 
 /**
 knownPendReqs() returns a set of requests that appear
-in the rep[i.pendReqs and also appear in the message
+in the rep[i].pendReqs and also appear in the message
 queues of at least another 3f + 1 processors
 */
 func knownPendReqs() []*types.Request {
@@ -383,17 +455,15 @@ func knownPendReqs() []*types.Request {
 		req := e.Value.(*types.Request)
 		count := 0
 		for _, rs := range rep {
-			//TODO: This condition might be unnecessary/wrong
 			if rs == rep[variables.Id] {
 				continue
 			}
 			var items []*types.Request
 			for el := rs.PendReqs.Front(); el != nil; el = el.Next() {
-				items = append(items, el.Value.(*types.RequestStatus).Req.Request)
+				items = types.AppendIfMissingRequest(items, el.Value.(*types.Request))
 			}
 			for el := rs.ReqQ.Front(); el != nil; el = el.Next() {
-				//TODO might need to check for duplicates
-				items = append(items, el.Value.(*types.RequestStatus).Req.Request)
+				items = types.AppendIfMissingRequest(items, el.Value.(*types.RequestStatus).Req.Request)
 			}
 			for _, item := range items {
 				if req.Equals(item) {
@@ -473,7 +543,7 @@ func existsPPrepMsg(request *types.Request, processor int) bool {
 /**
 unassignedReqs() returns the set of pending requests
 for which p[i] has neither seen a PRE-PREP message from
-the types.Primary, nor has it seen 3f + 1 processors that have
+the primary, nor has it seen 3f + 1 processors that have
 a PREP message for the same client request.
 */
 func unassignedReqs() []*types.Request {
@@ -501,13 +571,16 @@ func unassignedReqs() []*types.Request {
 
 /**
 acceptReqPPrep(x, types.Prim) returns True if there is a pre-prepare message
-from the types.Primary types.Prim for a request x and the request
+from the primary Prim for a request x and the request
 content is the same for 3f + 1 processors with the same
 sequence number and view types.Identifier.
 */
 func acceptReqPPrep(x *types.Request, prim int) bool {
+
 	isKnownPendReq := types.ContainsRequest(x, knownPendReqs())
+	logger.OutLogger.Println("isKnownPendReq =", isKnownPendReq)
 	if !isKnownPendReq {
+		logger.OutLogger.Println("isKnownPendReq =", isKnownPendReq)
 		return false
 	}
 	reqs := rep[variables.Id].ReqQ
@@ -554,12 +627,12 @@ func acceptReqPPrep(x *types.Request, prim int) bool {
 /**
 committedSet(x)
 */
-func committedSet(x *types.AcceptedRequest) []*types.ReplicaStructure {
-	var committedSet []*types.ReplicaStructure
+func committedSet(x *types.AcceptedRequest) []int {
+	var committedSet []int
 	for i := range rep {
 		if types.ContainsAcceptedRequest(x, msg([]types.Status{types.COMMIT}, i)) ||
 			types.ContainsAcceptedRequest(x, types.GetRequestsFromLog(rep[i].RLog)) {
-			committedSet = append(committedSet, rep[i])
+			committedSet = append(committedSet, i)
 		}
 	}
 	return committedSet
@@ -568,9 +641,6 @@ func committedSet(x *types.AcceptedRequest) []*types.ReplicaStructure {
 func ByzantineReplication() {
 	go handleClientMessages()
 	go handleReplicaMessages()
-	if rep[variables.Id] == nil{
-		log.Fatal("PLS KILL me")
-	}
 	for {
 		/*
 			Checking for View Change
@@ -613,7 +683,7 @@ func ByzantineReplication() {
 		if len(y) != 0 && len(x.RepState) == 0 {
 			x.RepState = y
 		}
-		rep[variables.Id].ConFlag = len(x.RepState) == 0
+		//rep[variables.Id].ConFlag = len(x.RepState) == 0
 		if !rep[variables.Id].ConFlag &&
 			(!rep[variables.Id].RepState.PrefixRelation(x.RepState) ||
 				rep[variables.Id].RepState.Equals(DEF_STATE().RepState) ||
@@ -621,11 +691,13 @@ func ByzantineReplication() {
 			rep[variables.Id].RepState = x.RepState
 		}
 		if staleRep() || conflict() {
+			logger.OutLogger.Println("Stale Rep = ", staleRep(), "Conflict =", conflict())
 			flushLocal()
 			//rep[variables.Id] = DEF_STATE()
 			needFlush = true
 		}
 		if flush {
+			logger.OutLogger.Println("Flush = ", flush)
 			flushLocal()
 		}
 		for _, el := range knownPendReqs() {
@@ -633,7 +705,7 @@ func ByzantineReplication() {
 		}
 		//Serviceable View and no conflicts
 		if AllowService() && !needFlush {
-			if NoViewChange() && viewChanged() {
+			if NoViewChange() && !viewChanged() {
 				if rep[variables.Id].Prim == variables.Id {
 					for req := rep[variables.Id].PendReqs.Front(); req != nil; req = req.Next() {
 						if seqn < lastExec()+Sigma*variables.K {
@@ -645,6 +717,7 @@ func ByzantineReplication() {
 							seqn++
 							reqSt.Req.Sq = seqn
 							reqSt.St = types.PRE_PREP
+							rep[variables.Id].Add(reqSt)
 
 							reqSt = new(types.RequestStatus)
 							reqSt.Req = new(types.AcceptedRequest)
@@ -653,6 +726,8 @@ func ByzantineReplication() {
 							seqn++
 							reqSt.Req.Sq = seqn
 							reqSt.St = types.PREP
+							rep[variables.Id].Add(reqSt)
+
 						}
 					}
 				} else {
@@ -670,8 +745,12 @@ func ByzantineReplication() {
 						}
 						return flag
 					})
+					logger.OutLogger.Println("Accepting Sequence Numbers from Primary.")
+					logger.OutLogger.Println("Examined Requests length =", len(reqs))
 					for _, x := range reqs {
+						logger.OutLogger.Println("Checking to Accept Request", x)
 						if acceptReqPPrep(x, rep[variables.Id].Prim) {
+							logger.OutLogger.Println("Accepting Request", x)
 							rep[variables.Id].Add(
 								&types.RequestStatus{
 									Req: &types.AcceptedRequest{Request: x},
@@ -716,13 +795,16 @@ func ByzantineReplication() {
 				}
 			}
 		}
-		//	Todo: Send Info
 		for i := 0; i < variables.N; i++ {
 			if i == variables.Id {
 				continue
 			}
 			messenger.SendReplica(rep[variables.Id], i)
 		}
+		logger.OutLogger.Println("Size of LastReq = ", len(rep[variables.Id].LastReq))
+		logger.OutLogger.Println("Size of PendReqs = ", rep[variables.Id].PendReqs.Len())
+		logger.OutLogger.Println("Size of ReqQ = ", rep[variables.Id].ReqQ.Len())
+
 		for cl := 0; cl < variables.K; cl++ {
 			for _, lastReq := range rep[variables.Id].LastReq {
 				if lastReq.Client == cl {

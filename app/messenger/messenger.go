@@ -124,7 +124,7 @@ func TransmitMessages() {
 			logger.ErrLogger.Fatal(err)
 		}
 		_, err = SndSockets[to].SendBytes(w.Bytes(), 0)
-		logger.OutLogger.Println("SENT Message to ", to)
+		//logger.OutLogger.Println("SENT Message to ", to)
 		if err != nil {
 			logger.ErrLogger.Fatal(err)
 		}
@@ -132,7 +132,7 @@ func TransmitMessages() {
 		if err != nil {
 			logger.ErrLogger.Fatal(err)
 		}
-		logger.OutLogger.Println("OKAY FROM ", to)
+		//logger.OutLogger.Println("OKAY FROM ", to)
 	}
 }
 
@@ -162,6 +162,7 @@ func Subscribe() {
 				if err != nil {
 					logger.ErrLogger.Fatal(err)
 				}
+				logger.OutLogger.Println("Request Received")
 				go handleRequest(message)
 				_ = <-replyChan[i]
 			}
@@ -200,6 +201,7 @@ func handleRequest(msg []byte) {
 }
 
 func ReplyClient(reply *types.Reply) {
+	logger.OutLogger.Println("Replying to Client.")
 	to := reply.Client
 	w := new(bytes.Buffer)
 	encoder := gob.NewEncoder(w)
@@ -218,6 +220,7 @@ func ReplyClient(reply *types.Reply) {
 	if err != nil {
 		logger.ErrLogger.Fatal(err)
 	}
+	logger.OutLogger.Println("Replied to Client.")
 	replyChan[to] <- struct{}{}
 }
 

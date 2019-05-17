@@ -4,6 +4,10 @@ import (
 	"SSBFT/app/messenger"
 	"SSBFT/types"
 	"SSBFT/variables"
+	"bytes"
+	"encoding/gob"
+	"log"
+	"time"
 )
 
 var beat []int // = make(, variables.N)
@@ -51,10 +55,30 @@ func reset() {
 	curCheckReq = make([]*types.Request, 0)
 }
 
-/*
-TODO Handling of token receipt
-*/
-func HandleToken() {
+func Monitor() {
+	go handleToken()
+	go func() {
+		for {
+			time.Sleep(time.Second)
+			token := new(types.Token)
+			token.FDSet = 0
+			token.PrimSusp = primSusp[variables.Id]
+			message := new(types.Message)
+			w := new(bytes.Buffer)
+			encoder := gob.NewEncoder(w)
+			err := encoder.Encode(token)
+			if err != nil {
+				log.Fatal(err)
+			}
+			message.Payload = w.Bytes()
+			message.Type = "Token"
+			message.From = variables.Id
+			messenger.Broadcast(*message)
+		}
+	}()
+}
+
+func handleToken() {
 	for {
 		msg := <-messenger.TokenChan
 		token := msg.Token

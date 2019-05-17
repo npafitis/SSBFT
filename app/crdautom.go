@@ -182,7 +182,7 @@ func handleCoordination() {
 			echo[message.From] = &types.AutomatonInfo{
 				Phase:   message.Message.Phase,
 				Witness: message.Message.Witness,
-				View:    message.Message.ViewVChange.View.Cur, // TODO: wherever there's view it's possible it should be VPair instead of int
+				View:    message.Message.ViewVChange.View.Cur,
 				VChange: message.Message.ViewVChange.ViewChange,
 			}
 			SetInfo(message.Message, message.From)

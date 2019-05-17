@@ -1,5 +1,32 @@
 package types
 
+type RLog []*LogTuple
+
+func AppendIfMissingRequest(slice []*Request, i *Request) []*Request {
+	for _, ele := range slice {
+		if ele.Equals(i) {
+			return slice
+		}
+	}
+	return append(slice, i)
+}
+
+func (tuples1 RLog) CommonPrefix(tuples2 RLog) RLog {
+	var logs RLog = make([]*LogTuple, 0)
+	var min RLog
+	if len(tuples1) < len(tuples2) {
+		min = tuples1
+	} else {
+		min = tuples2
+	}
+	for i := range min {
+		if tuples1[i].Equals(tuples2[i]) {
+			logs = append(logs, tuples1[i])
+		}
+	}
+	return logs
+}
+
 func ExcludeRequests(src []*Request, target []*Request) []*Request {
 	out := make([]*Request, 0)
 	copy(out, src)

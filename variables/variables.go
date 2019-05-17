@@ -13,7 +13,7 @@ var (
 	// This processor's known current primary
 	Prim int
 
-	T    int
+	T int
 	// Size of Clients Set
 	K int
 )

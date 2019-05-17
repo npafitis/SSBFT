@@ -219,11 +219,11 @@ func (r *AcceptedRequest) GobDecode(buf []byte) error {
 	if err != nil {
 		logger.ErrLogger.Fatal(err)
 	}
-	err = decoder.Decode(r.View)
+	err = decoder.Decode(&r.View)
 	if err != nil {
 		logger.ErrLogger.Fatal(err)
 	}
-	err = decoder.Decode(r.Sq)
+	err = decoder.Decode(&r.Sq)
 	if err != nil {
 		logger.ErrLogger.Fatal(err)
 	}

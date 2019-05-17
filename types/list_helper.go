@@ -4,6 +4,24 @@ import (
 	"container/list"
 )
 
+func PendReqsContains(l *list.List, request *Request) bool {
+	for e := l.Front(); e != nil; e = e.Next(){
+		if e.Value.(*Request).Equals(request){
+			return true
+		}
+	}
+	return false
+}
+
+func ReqQContains(l *list.List, rs *RequestStatus) bool {
+	for e:= l.Front();e != nil;e = e.Next(){
+		if e.Value.(*RequestStatus).Equals(rs){
+			return true
+		}
+	}
+	return false
+}
+
 func ListEquals(l1 *list.List, l2 *list.List) bool {
 	if l1.Len() != l2.Len() {
 		return false

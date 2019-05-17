@@ -18,7 +18,7 @@ type LogTuple struct {
 	// Request TODO [] : Check between AcceptedRequest and Request
 	Req *AcceptedRequest
 	// TODO: Type to be defined
-	XSet []*ReplicaStructure
+	XSet []int
 }
 
 func (lt *LogTuple) GobDecode(buf []byte) error {
@@ -251,9 +251,10 @@ func (rs *ReplicaStructure) Enqueue(el ...interface{}) {
 	if len(el) == 0 {
 		return
 	}
-	elType := reflect.TypeOf(el).Elem().Name()
+	elType := reflect.TypeOf(el[0]).String()
+	logger.OutLogger.Println("Enqueue Called with ", elType, ".")
 	switch elType {
-	case "Request":
+	case "*types.Request":
 		for _, element := range el {
 			element := element.(*Request)
 			for e := rs.PendReqs.Front(); e != nil; e = e.Next() {
@@ -263,8 +264,9 @@ func (rs *ReplicaStructure) Enqueue(el ...interface{}) {
 			}
 			rs.PendReqs.PushBack(element)
 		}
-
-	case "RequestStatus":
+		logger.OutLogger.Println("Enqueued Request in PendReqs")
+		break
+	case "*types.RequestStatus":
 		for _, element := range el {
 			element := element.(*RequestStatus)
 			for e := rs.ReqQ.Front(); e != nil; e = e.Next() {
@@ -274,8 +276,9 @@ func (rs *ReplicaStructure) Enqueue(el ...interface{}) {
 			}
 			rs.ReqQ.PushBack(element)
 		}
+		logger.OutLogger.Println("Enqueued RequestStatus in ReqQ")
 		break
-	case "RequestReply":
+	case "*types.RequestReply":
 		for _, element := range el {
 			element := element.(*RequestReply)
 			for i, reqRep := range rs.LastReq {
@@ -285,6 +288,9 @@ func (rs *ReplicaStructure) Enqueue(el ...interface{}) {
 			}
 			rs.LastReq = append(rs.LastReq, element)
 		}
+		logger.OutLogger.Println("Enqueued RequestReply in LastReq")
+
+		break
 	}
 }
 
@@ -295,9 +301,10 @@ func (rs *ReplicaStructure) Remove(el ...interface{}) {
 	if len(el) == 0 {
 		return
 	}
-	elType := reflect.TypeOf(el[0]).Elem().Name()
+	elType := reflect.TypeOf(el[0]).String()
+	logger.OutLogger.Println("Remove Called with ", elType)
 	switch elType {
-	case "Request":
+	case "*types.Request":
 		for _, element := range el {
 			element := element.(*Request)
 			for e := rs.PendReqs.Front(); e != nil; e = e.Next() {
@@ -307,7 +314,7 @@ func (rs *ReplicaStructure) Remove(el ...interface{}) {
 			}
 		}
 
-	case "AcceptedRequest":
+	case "*types.AcceptedRequest":
 		for _, element := range el {
 			element := element.(*AcceptedRequest)
 			for e := rs.ReqQ.Front(); e != nil; e = e.Next() {
@@ -316,7 +323,7 @@ func (rs *ReplicaStructure) Remove(el ...interface{}) {
 				}
 			}
 		}
-	case "RequestReply":
+	case "*types.RequestReply":
 		for _, element := range el {
 			element := element.(*RequestReply)
 			for i, reqRep := range rs.LastReq {
@@ -335,21 +342,34 @@ func (rs *ReplicaStructure) Add(el ...interface{}) {
 	if len(el) == 0 {
 		return
 	}
-	elType := reflect.TypeOf(el[0]).Elem().Name()
+	elType := reflect.TypeOf(el[0]).String()
+	logger.OutLogger.Println("Add Called with ", elType)
 	switch elType {
-	case "Request":
+	case "*types.Request":
 		for _, element := range el {
 			element := element.(*Request)
 			rs.PendReqs.PushBack(element)
 		}
 		break
-	case "AcceptedRequest":
+	case "*types.RequestStatus":
+		for _, element := range el {
+			element := element.(*RequestStatus)
+			for e:= rs.ReqQ.Front();e!= nil;e=e.Next(){
+				if e.Value.(*RequestStatus).Equals(element){
+					return
+				}
+			}
+			logger.OutLogger.Println("Setting", element.St ,"to", element.Req)
+			rs.ReqQ.PushBack(element)
+		}
+		break
+	case "*types.AcceptedRequest":
 		for _, element := range el {
 			element := element.(*AcceptedRequest)
 			rs.ReqQ.PushBack(&RequestStatus{Req: element, St: PRE_PREP})
 		}
 		break
-	case "RequestReply":
+	case "*types.RequestReply":
 		for _, element := range el {
 			element := element.(*RequestReply)
 			rs.LastReq = append(rs.LastReq, element)

@@ -14,14 +14,27 @@ import (
 
 func Initialise(id int, n int, t int, k int) {
 	variables.Initialise(id, n, t, k)
+
 	logger.InitialiseLogger()
+
+	logger.OutLogger.Println(
+		"N", variables.N,
+		"ID", variables.Id,
+		"F", variables.F,
+		"Threshold T", variables.T,
+		"Client Size", variables.K,
+	)
+
 	config.InitialiseIP(n)
+
 	messenger.InitialiseMessenger()
+
 	app.InitializeAutomaton()
 	app.InitializeViewChange()
 	app.InitializeFailureDetector()
 	app.InitializeEstablishment()
 	app.InitializeReplication()
+
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
@@ -53,6 +66,7 @@ func main() {
 	messenger.Subscribe()
 
 	go messenger.TransmitMessages()
+	go app.Monitor()
 	go app.ByzantineReplication()
 	go app.ViewChangeMonitor()
 	go app.CoordinatingAutomaton()

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"SSBFT/logger"
 	"SSBFT/types"
 	"SSBFT/variables"
 )
@@ -52,6 +53,7 @@ func ResetAll() string {
 }
 
 func ViewChange() {
+	logger.OutLogger.Println("Change View")
 	vChange[variables.Id] = true
 }
 
