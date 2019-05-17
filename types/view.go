@@ -1,6 +1,7 @@
 package types
 
 import (
+	"SSBFT/logger"
 	"bytes"
 	"encoding/gob"
 )
@@ -30,25 +31,25 @@ func (vp VPair) GobEncode() ([]byte, error) {
 	encoder := gob.NewEncoder(w)
 	err := encoder.Encode(vp.Cur)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(vp.Next)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	return w.Bytes(), nil
 }
 
-func (vp VPair) GobDecode(buf []byte) error {
+func (vp *VPair) GobDecode(buf []byte) error {
 	r := bytes.NewBuffer(buf)
 	decoder := gob.NewDecoder(r)
-	err := decoder.Decode(vp.Cur)
+	err := decoder.Decode(&vp.Cur)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
-	err = decoder.Decode(vp.Next)
+	err = decoder.Decode(&vp.Next)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	return nil
 }
@@ -76,30 +77,30 @@ type ViewVChange struct {
 	ViewChange bool
 }
 
-func (vv ViewVChange) GobEncoder() ([]byte, error) {
-	w := new(bytes.Buffer)
-	encoder := gob.NewEncoder(w)
-	err := encoder.Encode(vv.View)
-	if err != nil {
-		return nil, err
-	}
-	err = encoder.Encode(vv.ViewChange)
-	if err != nil {
-		return nil, err
-	}
-	return w.Bytes(), nil
-}
-
-func (vv ViewVChange) GobDecode(buf []byte) error {
-	r := bytes.NewBuffer(buf)
-	decoder := gob.NewDecoder(r)
-	err := decoder.Decode(&vv.View)
-	if err != nil {
-		return err
-	}
-	err = decoder.Decode(&vv.ViewChange)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+//func (vv *ViewVChange) GobEncoder() ([]byte, error) {
+//	w := new(bytes.Buffer)
+//	encoder := gob.NewEncoder(w)
+//	err := encoder.Encode(vv.View)
+//	if err != nil {
+//		logger.ErrLogger.Fatal(err)
+//	}
+//	err = encoder.Encode(vv.ViewChange)
+//	if err != nil {
+//		logger.ErrLogger.Fatal(err)
+//	}
+//	return w.Bytes(), nil
+//}
+//
+//func (vv *ViewVChange) GobDecode(buf []byte) error {
+//	r := bytes.NewBuffer(buf)
+//	decoder := gob.NewDecoder(r)
+//	err := decoder.Decode(vv.View)
+//	if err != nil {
+//		logger.ErrLogger.Fatal(err)
+//	}
+//	err = decoder.Decode(&vv.ViewChange)
+//	if err != nil {
+//		logger.ErrLogger.Fatal(err)
+//	}
+//	return nil
+//}

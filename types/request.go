@@ -1,6 +1,7 @@
 package types
 
 import (
+	"SSBFT/logger"
 	"bytes"
 	"encoding/gob"
 	"time"
@@ -21,11 +22,11 @@ func (op Operation) GobDecode(buf []byte) error {
 	decoder := gob.NewDecoder(r)
 	err := decoder.Decode(&op.Op)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&op.Value)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	return nil
 }
@@ -35,11 +36,11 @@ func (op Operation) GobEncode() ([]byte, error) {
 	encoder := gob.NewEncoder(w)
 	err := encoder.Encode(op.Op)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(op.Value)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	return w.Bytes(), nil
 }
@@ -65,15 +66,15 @@ func (r *Request) GobDecode(buf []byte) error {
 	decoder := gob.NewDecoder(read)
 	err := decoder.Decode(&r.Client)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&r.TimeStamp)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&r.Operation)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	return nil
 }
@@ -83,11 +84,15 @@ func (r *Request) GobEncode() ([]byte, error) {
 	encoder := gob.NewEncoder(w)
 	err := encoder.Encode(r.Client)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(r.TimeStamp)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
+	}
+	err = encoder.Encode(r.Operation)
+	if err != nil {
+		logger.ErrLogger.Fatal(err)
 	}
 	return w.Bytes(), nil
 }
@@ -105,23 +110,23 @@ func (rep *Reply) GobDecode(buf []byte) error {
 	decoder := gob.NewDecoder(r)
 	err := decoder.Decode(&rep.View)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&rep.TimeStamp)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&rep.Client)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&rep.Id)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&rep.Result)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	return nil
 }
@@ -131,23 +136,23 @@ func (rep *Reply) GobEncode() ([]byte, error) {
 	encoder := gob.NewEncoder(w)
 	err := encoder.Encode(rep.View)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(rep.TimeStamp)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(rep.Client)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(rep.Id)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(rep.Result)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	return w.Bytes(), nil
 }
@@ -163,15 +168,15 @@ func (rr *RequestReply) GobDecode(buf []byte) error {
 	decoder := gob.NewDecoder(r)
 	err := decoder.Decode(&rr.Req)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&rr.Client)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&rr.Rep)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	return nil
 }
@@ -181,15 +186,15 @@ func (rr *RequestReply) GobEncode() ([]byte, error) {
 	encoder := gob.NewEncoder(w)
 	err := encoder.Encode(rr.Req)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(rr.Client)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(rr.Rep)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	return w.Bytes(), nil
 }
@@ -212,15 +217,15 @@ func (r *AcceptedRequest) GobDecode(buf []byte) error {
 	decoder := gob.NewDecoder(read)
 	err := decoder.Decode(&r.Request)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(r.View)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(r.Sq)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	return nil
 }
@@ -230,15 +235,15 @@ func (r *AcceptedRequest) GobEncode() ([]byte, error) {
 	encoder := gob.NewEncoder(w)
 	err := encoder.Encode(r.Request)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(r.View)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(r.Sq)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	return w.Bytes(), err
 }
@@ -250,7 +255,7 @@ func (r *Request) Equals(request *Request) bool {
 
 func (rep *Reply) Equals(request *Reply) bool {
 	return rep.Client == request.Client && rep.TimeStamp.Equal(request.TimeStamp) &&
-		rep.Id == request.Id && rep.Result == request.Result
+		rep.Id == request.Id && rep.Result.Equals(request.Result)
 }
 
 func (r *AcceptedRequest) Equals(req *AcceptedRequest) bool {

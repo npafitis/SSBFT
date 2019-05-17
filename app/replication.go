@@ -2,11 +2,12 @@ package app
 
 import (
 	"SSBFT/app/messenger"
-	"SSBFT/helper"
 	"SSBFT/types"
 	"SSBFT/variables"
 	"container/list"
 	"errors"
+	"log"
+	"math"
 	"reflect"
 	"time"
 )
@@ -14,10 +15,7 @@ import (
 /**
 Constants
 */
-//Number of processors
-//var N int
 var MAXINT int
-//var F int
 /*****************/
 // Identifier(i) of processor p[i]
 //var types.Id int
@@ -28,7 +26,7 @@ var (
 )
 
 // Default/Incorruptible Fallback state
-//var DEF_STATE = &types.ReplicaStructure{RepState: nil, RLog: nil, PendReqs: list.New(), ReqQ: list.New(), LastReq: nil, ConFlag: false, ViewChanged: false}
+
 var seqn int // [0, MAXINT]
 var rep []*types.ReplicaStructure
 var needFlush bool
@@ -43,9 +41,17 @@ func DEF_STATE() *types.ReplicaStructure {
 Interface for BFT
 */
 
-func ReplicationInit() {
+func InitializeReplication() {
 	rep = make([]*types.ReplicaStructure, variables.N)
+	for i:= range rep{
+		rep[i] = new(types.ReplicaStructure)
+		replica := DEF_STATE()
+		rep[i] = replica
+	}
+	Sigma = 1
+	MAXINT = int(math.Pow(2, 64))
 }
+
 func GetPendReqs() (set []*types.Request, err error) {
 	if !rep[variables.Id].ViewChanged {
 		return types.MergeRequestSets(knownPendReqs(), unassignedReqs()), nil
@@ -171,7 +177,10 @@ lastExec() returns the last request sequence number
 executed by p[i].
 */
 func lastExec() int {
-	return rep[variables.Id].LastExec().Req.Sq
+	if rep[variables.Id].LastExec() != nil {
+		return rep[variables.Id].LastExec().Req.Sq
+	}
+	return 0
 }
 
 /**
@@ -368,7 +377,7 @@ in the rep[i.pendReqs and also appear in the message
 queues of at least another 3f + 1 processors
 */
 func knownPendReqs() []*types.Request {
-	var returnReqs []*types.Request
+	var returnReqs = make([]*types.Request, 0)
 	pendReqs := rep[variables.Id].PendReqs
 	for e := pendReqs.Front(); e != nil; e = e.Next() {
 		req := e.Value.(*types.Request)
@@ -483,7 +492,7 @@ func unassignedReqs() []*types.Request {
 				break
 			}
 		}
-		if !existsPPrepMsg(req, variables.Prim) && !exists {
+		if !existsPPrepMsg(req, rep[variables.Id].Prim) && !exists {
 			returnReqs = append(returnReqs, req)
 		}
 	}
@@ -559,20 +568,24 @@ func committedSet(x *types.AcceptedRequest) []*types.ReplicaStructure {
 func ByzantineReplication() {
 	go handleClientMessages()
 	go handleReplicaMessages()
+	if rep[variables.Id] == nil{
+		log.Fatal("PLS KILL me")
+	}
 	for {
 		/*
 			Checking for View Change
 		*/
-		if viewChanged() && AllowService() {
-			!viewChanged() = rep[variables.Id] != nil &&
-				GetView(variables.Id) != variables.Prim
+		if !viewChanged() && AllowService() {
+			rep[variables.Id].ViewChanged =
+				(rep[variables.Id] != nil) &&
+					(GetView(variables.Id) != rep[variables.Id].Prim)
 		}
-		variables.Prim = GetView(variables.Id)
-		if viewChanged() && variables.Prim == variables.Id {
+		rep[variables.Id].Prim = GetView(variables.Id)
+		if viewChanged() && rep[variables.Id].Prim == variables.Id {
 			var processorSet []*types.ReplicaStructure
 			for i, rs := range rep {
 				if rs.ViewChanged &&
-					variables.Prim == GetView(i) {
+					rep[variables.Id].Prim == GetView(i) {
 					processorSet = append(processorSet, rs)
 				}
 			}
@@ -583,12 +596,12 @@ func ByzantineReplication() {
 				rep[variables.Id].ViewChanged = false
 			}
 		} else if viewChanged() &&
-			rep[variables.Prim].ViewChanged == rep[variables.Id].ViewChanged &&
-			rep[variables.Prim].Prim == rep[variables.Id].Prim &&
-			checkNewVState(variables.Prim) &&
+			rep[rep[variables.Id].Prim].ViewChanged == rep[variables.Id].ViewChanged &&
+			rep[rep[variables.Id].Prim].Prim == rep[variables.Id].Prim &&
+			checkNewVState(rep[variables.Id].Prim) &&
 			countCommonPrimary() >= 4*variables.F+1 {
 
-			rep[variables.Id] = rep[variables.Prim]
+			rep[variables.Id] = rep[rep[variables.Id].Prim]
 			rep[variables.Id].ViewChanged = false
 		}
 		/*
@@ -609,9 +622,9 @@ func ByzantineReplication() {
 		}
 		if staleRep() || conflict() {
 			flushLocal()
+			//rep[variables.Id] = DEF_STATE()
+			needFlush = true
 		}
-		rep[variables.Id] = nil
-		needFlush = true
 		if flush {
 			flushLocal()
 		}
@@ -621,14 +634,14 @@ func ByzantineReplication() {
 		//Serviceable View and no conflicts
 		if AllowService() && !needFlush {
 			if NoViewChange() && viewChanged() {
-				if variables.Prim == variables.Id {
+				if rep[variables.Id].Prim == variables.Id {
 					for req := rep[variables.Id].PendReqs.Front(); req != nil; req = req.Next() {
 						if seqn < lastExec()+Sigma*variables.K {
 							// 3-phase commit Replication
 							reqSt := new(types.RequestStatus)
 							reqSt.Req = new(types.AcceptedRequest)
 							reqSt.Req.Request = req.Value.(*types.Request)
-							reqSt.Req.View = variables.Prim
+							reqSt.Req.View = rep[variables.Id].Prim
 							seqn++
 							reqSt.Req.Sq = seqn
 							reqSt.St = types.PRE_PREP
@@ -636,15 +649,15 @@ func ByzantineReplication() {
 							reqSt = new(types.RequestStatus)
 							reqSt.Req = new(types.AcceptedRequest)
 							reqSt.Req.Request = req.Value.(*types.Request)
-							reqSt.Req.View = variables.Prim
+							reqSt.Req.View = rep[variables.Id].Prim
 							seqn++
 							reqSt.Req.Sq = seqn
 							reqSt.St = types.PREP
 						}
 					}
 				} else {
-					reqs := helper.ExcludeRequests(knownPendReqs(), unassignedReqs())
-					reqs = helper.FilterRequests(reqs, func(request *types.Request) bool {
+					reqs := types.ExcludeRequests(knownPendReqs(), unassignedReqs())
+					reqs = types.FilterRequests(reqs, func(request *types.Request) bool {
 						flag := false
 					outer:
 						for _, replica := range rep {
@@ -658,7 +671,7 @@ func ByzantineReplication() {
 						return flag
 					})
 					for _, x := range reqs {
-						if acceptReqPPrep(x, variables.Prim) {
+						if acceptReqPPrep(x, rep[variables.Id].Prim) {
 							rep[variables.Id].Add(
 								&types.RequestStatus{
 									Req: &types.AcceptedRequest{Request: x},
@@ -675,8 +688,8 @@ func ByzantineReplication() {
 					}
 					//	if 3f + 1 commited then commit.
 					// TODO: Union or Section
-					reqQ := helper.ToSliceRequestStatus(rep[variables.Id].ReqQ)
-					reqQ = helper.FilterRequestStatus(reqQ, func(rs *types.RequestStatus) bool {
+					reqQ := types.ToSliceRequestStatus(rep[variables.Id].ReqQ)
+					reqQ = types.FilterRequestStatus(reqQ, func(rs *types.RequestStatus) bool {
 						for _, x := range knownReqs(types.PREP, types.COMMIT) {
 							if rs.Equals(x) {
 								return false
@@ -731,7 +744,7 @@ if necessary
 func countCommonPrimary() int {
 	count := 0
 	for i := range rep {
-		if GetView(i) == variables.Prim {
+		if GetView(i) == rep[variables.Id].Prim {
 			count++
 		}
 	}

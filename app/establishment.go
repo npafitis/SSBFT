@@ -7,26 +7,31 @@ import (
 
 /*
 Variables for View Establishment
- */
-var views = make([]types.VPair, variables.N)
+*/
+var views []types.VPair //= make([]types.VPair, variables.N)
 
-var vChange = make([]bool, variables.N)
+var vChange []bool // = make([]bool, variables.N)
+
+func InitializeEstablishment() {
+	views = make([]types.VPair, variables.N)
+	vChange = make([]bool, variables.N)
+}
 
 /*
 Constants for View Establishment
- */
+*/
 //TODO [ ]: values might not be correct
 const DF_VIEW_CUR int = 0
 
-var DF_VIEW_NEXT = 1
+const DF_VIEW_NEXT = 1
 
 func RstPair() types.VPair {
-	return types.VPair{Cur: nil, Next: DF_VIEW_NEXT}
+	return types.VPair{Cur: DF_VIEW_CUR, Next: DF_VIEW_NEXT}
 }
 
 /**
 Aliases for View Establishment
- */
+*/
 func vp(j int) types.VPair {
 	return views[j]
 }
@@ -40,7 +45,7 @@ func NeedReset() bool {
 }
 
 func ResetAll() string {
-	views[variables.Id]=RstPair()
+	views[variables.Id] = RstPair()
 	AutomatonInit()
 	RepRequestReset()
 	return "Reset"
@@ -52,12 +57,12 @@ func ViewChange() {
 
 func AllowService() bool {
 	return ((len(sameVSet(vp(variables.Id).Cur, types.ONE)) +
-		len(sameVSet(vp(variables.Id).Cur, types.ZERO)))>=3*variables.F+1) &&
-		(phase(variables.Id)== types.ZERO && vp(variables.Id).Cur == vp(variables.Id).Next)
+		len(sameVSet(vp(variables.Id).Cur, types.ZERO))) >= 3*variables.F+1) &&
+		(phase(variables.Id) == types.ZERO && vp(variables.Id).Cur == vp(variables.Id).Next)
 }
 
 func GetView(j int) int {
-	if j == variables.Id && phase(variables.Id) ==0 && witnessSeen(){
+	if j == variables.Id && phase(variables.Id) == 0 && witnessSeen() {
 		if AllowService() {
 			return vp(variables.Id).Cur
 		}
@@ -69,12 +74,12 @@ func Automaton(t types.Type, p types.Phase, c int) (val bool, action string) {
 	val = false
 	switch {
 	case t == types.PRED && p == types.ZERO && c == 0:
-		for i, v := range views{
+		for i, v := range views {
 			if transitAdopble(i, 0, types.Follow) {
 				val = true
 				if (v.Next != vp(variables.Id).Next) &&
 					v.Next != vp(variables.Id).Cur &&
-					val{
+					val {
 					return true, "Adopt this View"
 				}
 			}
@@ -84,50 +89,50 @@ func Automaton(t types.Type, p types.Phase, c int) (val bool, action string) {
 	case t == types.ACT && p == types.ZERO && c == 0:
 		adopt(vp(variables.Id))
 		resetVChange()
-	case t== types.PRED && p == types.ZERO && c == 1:
+	case t == types.PRED && p == types.ZERO && c == 1:
 		val = vChange[variables.Id] && establishable(types.ZERO, types.Follow)
 	case t == types.ACT && p == types.ZERO && c == 1:
 		nextView()
 		resetVChange()
 	case t == types.PRED && p == types.ZERO && c == 2:
 		val = transitAdopble(variables.Id, types.ZERO, types.Remain) || vp(variables.Id).Equals(RstPair())
-	case t == types.ACT && p == types.ZERO && c ==2 :
+	case t == types.ACT && p == types.ZERO && c == 2:
 		action = "No Action"
 	case t == types.PRED && p == types.ZERO && c == 3:
 		val = true
 	case t == types.ACT && p == types.ZERO && c == 3:
 		action = ResetAll()
 		resetVChange()
-	case t== types.PRED && p == types.ONE && c ==0 :
-		for i := range views{
+	case t == types.PRED && p == types.ONE && c == 0:
+		for i := range views {
 			val = transitAdopble(i, types.ONE, types.Follow)
 		}
 		val = val && (vp(variables.Id).Cur != vp(variables.Id).Next)
-	case t== types.ACT && p == types.ONE && c ==0:
+	case t == types.ACT && p == types.ONE && c == 0:
 		adopt(vp(variables.Id))
 		resetVChange()
-	case t== types.PRED && p == types.ONE && c ==1:
-		val = establishable( p, types.Follow)
-	case t== types.ACT && p == types.ONE && c ==1:
-		if vp(variables.Id).Equals(RstPair()){
+	case t == types.PRED && p == types.ONE && c == 1:
+		val = establishable(p, types.Follow)
+	case t == types.ACT && p == types.ONE && c == 1:
+		if vp(variables.Id).Equals(RstPair()) {
 			ReplicaFlush()
 		}
 		establish()
 		resetVChange()
-	case t== types.PRED && p == types.ONE && c ==2:
+	case t == types.PRED && p == types.ONE && c == 2:
 		val = transitAdopble(variables.Id, p, types.Remain)
-	case t== types.ACT && p == types.ONE && c ==2:
+	case t == types.ACT && p == types.ONE && c == 2:
 		action = "No Action"
-	case t== types.PRED && p == types.ONE && c ==3:
+	case t == types.PRED && p == types.ONE && c == 3:
 		val = true
-	case t== types.ACT && p == types.ONE && c ==3:
+	case t == types.ACT && p == types.ONE && c == 3:
 		action = ResetAll()
 		resetVChange()
 	}
 	return val, action
 }
 
-func AutoMaxCase(p types.Phase)  int {
+func AutoMaxCase(p types.Phase) int {
 	switch p {
 	case types.ZERO:
 		return 3
@@ -137,8 +142,8 @@ func AutoMaxCase(p types.Phase)  int {
 	return 3
 }
 
-func GetInfo(k int) types.ViewVChange {
-	return types.ViewVChange{View: views[k],ViewChange:vChange[k]}
+func GetInfo(k int) *types.ViewVChange {
+	return &types.ViewVChange{View: types.VPair{Cur: views[k].Cur, Next: views[k].Next}, ViewChange: vChange[k]}
 }
 
 func SetInfo(m *types.CoordinationMessage, k int) {
@@ -147,7 +152,7 @@ func SetInfo(m *types.CoordinationMessage, k int) {
 
 /*
 Macros for View Establishment Algorithm
- */
+*/
 
 func legitPhsZero(vp types.VPair) bool {
 	return (vp.Cur == vp.Next || vp.Equals(RstPair())) &&
@@ -212,7 +217,7 @@ func transitAdopble(j int, ph types.Phase, d types.Mode) bool {
 func transitSet(j int, ph types.Phase, d types.Mode) []int {
 	var set = make([]int, 0)
 	for i := 0; i < variables.N; i++ {
-		if phase(i) == ph && transitionCases(j, vp(i), ph, d) && !staleV(i){
+		if phase(i) == ph && transitionCases(j, vp(i), ph, d) && !staleV(i) {
 			set = append(set, i)
 		}
 	}
@@ -226,7 +231,7 @@ func transitionCases(j int, vPair types.VPair, ph types.Phase, t types.Mode) boo
 	case types.Follow:
 		switch ph {
 		case 0:
-			return vPair.Next == (vp(j).Cur + 1) %variables.N //TODO [ ]: Parentheses might be wrong
+			return vPair.Next == (vp(j).Cur+1)%variables.N //TODO [ ]: Parentheses might be wrong
 		case 1:
 			return vPair.Cur == vp(j).Next
 		}
@@ -235,16 +240,16 @@ func transitionCases(j int, vPair types.VPair, ph types.Phase, t types.Mode) boo
 }
 
 func adopt(vPair types.VPair) {
-	vp(variables.Id).Next = vPair.Cur
+	views[variables.Id].Next = vPair.Cur
 }
 
 //TODO [ ]: *vp(types.Id).Cur might not be correct
 func establishable(ph types.Phase, mode types.Mode) bool {
-	return (len(sameVSet(vp(variables.Id).Cur, phase(variables.Id))) + len(transitSet(variables.Id, ph, mode))) >= 4*variables.F+ 1
+	return (len(sameVSet(vp(variables.Id).Cur, phase(variables.Id))) + len(transitSet(variables.Id, ph, mode))) >= 4*variables.F+1
 }
 
 func establish() {
-	vp(variables.Id).Cur = vp(variables.Id).Next
+	views[variables.Id].Cur = vp(variables.Id).Next
 }
 
 func nextView() {

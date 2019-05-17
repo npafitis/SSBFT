@@ -9,7 +9,7 @@ var RepAddresses map[string]int
 var ReqAddresses map[string]int
 var ServerAddresses map[string]int
 
-func Initialise(n int) {
+func InitialiseIP(n int) {
 	RepAddresses = make(map[string]int, n)
 	ReqAddresses = make(map[string]int, n)
 	ServerAddresses = make(map[string]int, variables.K)

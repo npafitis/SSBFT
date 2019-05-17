@@ -1,6 +1,7 @@
 package types
 
 import (
+	"SSBFT/logger"
 	"bytes"
 	"encoding/gob"
 )
@@ -17,19 +18,19 @@ func (vcm *VCM) GobDecode(buf []byte) error {
 	decoder := gob.NewDecoder(r)
 	err := decoder.Decode(&vcm.VStatus)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&vcm.Prim)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&vcm.NeedChange)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&vcm.NeedChgSet)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	return nil
 }
@@ -39,15 +40,15 @@ func (vcm *VCM) GobEncode() ([]byte, error) {
 	encoder := gob.NewEncoder(w)
 	err := encoder.Encode(vcm.VStatus)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(vcm.Prim)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(vcm.NeedChange)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(vcm.NeedChgSet)
 	return w.Bytes(), nil

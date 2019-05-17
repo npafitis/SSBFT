@@ -1,6 +1,7 @@
 package types
 
 import (
+	"SSBFT/logger"
 	"bytes"
 	"encoding/gob"
 )
@@ -15,11 +16,11 @@ func (cm *ClientMessage) GobDecode(buf []byte) error {
 	decoder := gob.NewDecoder(r)
 	err := decoder.Decode(&cm.Req)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&cm.Ack)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	return nil
 }
@@ -29,11 +30,11 @@ func (cm *ClientMessage) GobEncode() ([]byte, error) {
 	encoder := gob.NewEncoder(w)
 	err := encoder.Encode(cm.Req)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(cm.Ack)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	return w.Bytes(), nil
 }

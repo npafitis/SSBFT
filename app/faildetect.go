@@ -6,17 +6,23 @@ import (
 	"SSBFT/variables"
 )
 
-var beat = make([]int, variables.N)
+var beat []int // = make(, variables.N)
 
 var FDSet []int
 
-var cnt = make([]int, variables.N)
+var cnt []int // = make([]int, variables.N)
 
-var primSusp = make([]bool, variables.N)
+var primSusp []bool //= make([]bool, variables.N)
 
 var curCheckReq []*types.Request
 
-//var prim int
+func InitializeFailureDetector() {
+	beat = make([]int, variables.N)
+	FDSet = make([]int, 0)
+	cnt = make([]int, variables.N)
+	primSusp = make([]bool, variables.N)
+	curCheckReq = make([]*types.Request, variables.N)
+}
 
 /*
 Interface for Failure Detector

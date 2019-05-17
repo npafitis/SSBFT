@@ -1,12 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/app/establishment.go" line="72" />
-    <bookmark url="file://$PROJECT_DIR$/types/request.go" line="196" />
+    <bookmark url="file://$PROJECT_DIR$/app/establishment.go" line="77" />
+    <bookmark url="file://$PROJECT_DIR$/types/request.go" line="201" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5c5ff8f8-300f-41d5-adac-1fdbb0ed5311" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config/scenario.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/crdautom.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/crdautom.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/establishment.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/establishment.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/faildetect.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/faildetect.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/messenger/messenger.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/messenger/messenger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/replication.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/replication.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/viewchange.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/viewchange.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/ip.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/ip.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/helper/list.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/list_helper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/helper/slice.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/slice_helper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logger/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/logger/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/clientmessage.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/clientmessage.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/coordination.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/coordination.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/message.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/message.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/request.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/request.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/structure.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/structure.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/token.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/token.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/vcm.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/vcm.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/view.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/view.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/variables/variables.go" beforeDir="false" afterPath="$PROJECT_DIR$/variables/variables.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -33,44 +54,58 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/messenger/messenger.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="175" column="9" selection-start-line="175" selection-start-column="9" selection-end-line="175" selection-end-column="9" />
+            <state relative-caret-position="7000">
+              <caret line="259" column="17" selection-start-line="259" selection-start-column="17" selection-end-line="259" selection-end-column="17" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/types/message.go">
+        <entry file="file://$PROJECT_DIR$/app/viewchange.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="269">
-              <caret line="35" selection-start-line="35" selection-end-line="35" />
+            <state relative-caret-position="112">
+              <caret line="11" column="19" selection-start-line="11" selection-start-column="19" selection-end-line="11" selection-end-column="19" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/replication.go">
+        <entry file="file://$PROJECT_DIR$/types/vcm.go">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/crdautom.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="4200">
+              <caret line="157" column="39" selection-start-line="157" selection-start-column="39" selection-end-line="157" selection-end-column="39" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/establishment.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="3976">
+              <caret line="145" column="12" selection-start-line="145" selection-start-column="12" selection-end-line="145" selection-end-column="12" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/types/coordination.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="224">
-              <caret line="107" column="34" selection-start-line="107" selection-start-column="34" selection-end-line="107" selection-end-column="34" />
+              <caret line="12" column="24" selection-start-line="12" selection-start-column="24" selection-end-line="12" selection-end-column="24" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
+        <entry file="file://$PROJECT_DIR$/types/view.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="6" selection-start-column="6" selection-end-column="6" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/types/request.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="206">
-              <caret line="94" column="5" selection-start-line="94" selection-start-column="5" selection-end-line="94" selection-end-column="5" />
+            <state relative-caret-position="421">
+              <caret line="105" column="3" selection-start-line="105" selection-start-column="3" selection-end-line="105" selection-end-column="3" />
             </state>
           </provider>
         </entry>
@@ -87,23 +122,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>handle</find>
-      <find>fuck</find>
-      <find>variables</find>
-      <find>echo</find>
-      <find>echoNo</find>
-      <find>No</find>
-      <find>no</find>
-      <find>NoW</find>
-      <find>Coordination</find>
-      <find>getInf</find>
-      <find>GetInfo</find>
-      <find>valid</find>
-      <find>getinf</find>
-      <find>getInfo</find>
-      <find>GetInf</find>
-      <find>reset</find>
-      <find>hint</find>
       <find>ACK</find>
       <find>const</find>
       <find>Client</find>
@@ -117,6 +135,23 @@
       <find>Add</find>
       <find>apply</find>
       <find>ap</find>
+      <find>variables.Prim</find>
+      <find>helper&quot;</find>
+      <find>Equals</find>
+      <find>adopt</find>
+      <find>SendMess</find>
+      <find>transmi</find>
+      <find>reply</find>
+      <find>Decode</find>
+      <find>decode</find>
+      <find>return err</find>
+      <find>encode</find>
+      <find>return nil, err</find>
+      <find>Coordination</find>
+      <find>sendCoo</find>
+      <find>Type: &quot;CoordinationMessage&quot;</find>
+      <find>.Encode(</find>
+      <find>vchange</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -130,6 +165,8 @@
       <replace>logger.ErrLogger.Fatal(</replace>
       <replace>Context</replace>
       <replace>go logger.</replace>
+      <replace>rep[variables.Id].Prim</replace>
+      <replace>logger.ErrLogger.Fatal(err)</replace>
     </replaceStrings>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
@@ -139,10 +176,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/monitor/faildetect.go" />
-        <option value="$PROJECT_DIR$/replication/replication.go" />
-        <option value="$PROJECT_DIR$/view/establishment.go" />
-        <option value="$PROJECT_DIR$/view/crdautom.go" />
         <option value="$PROJECT_DIR$/monitor/viewchange.go" />
         <option value="$PROJECT_DIR$/common/state.go" />
         <option value="$PROJECT_DIR$/common/repstate.go" />
@@ -162,21 +195,8 @@
         <option value="$PROJECT_DIR$/app/establishment_test.go" />
         <option value="$PROJECT_DIR$/log/logger.go" />
         <option value="$PROJECT_DIR$/app/crdautom_test.go" />
-        <option value="$PROJECT_DIR$/logger/logger.go" />
         <option value="$PROJECT_DIR$/app/msg/msg.go" />
-        <option value="$PROJECT_DIR$/main.go" />
         <option value="$PROJECT_DIR$/types/Coordination.go" />
-        <option value="$PROJECT_DIR$/types/coordination.go" />
-        <option value="$PROJECT_DIR$/types/view.go" />
-        <option value="$PROJECT_DIR$/app/establishment.go" />
-        <option value="$PROJECT_DIR$/app/crdautom.go" />
-        <option value="$PROJECT_DIR$/types/vcm.go" />
-        <option value="$PROJECT_DIR$/types/token.go" />
-        <option value="$PROJECT_DIR$/app/viewchange.go" />
-        <option value="$PROJECT_DIR$/app/faildetect.go" />
-        <option value="$PROJECT_DIR$/variables/variables.go" />
-        <option value="$PROJECT_DIR$/config/ip.go" />
-        <option value="$PROJECT_DIR$/types/clientmessage.go" />
         <option value="$PROJECT_DIR$/types/repstate.go" />
         <option value="$PROJECT_DIR$/types/comparable.go" />
         <option value="$PROJECT_DIR$/helper.go" />
@@ -184,27 +204,37 @@
         <option value="$PROJECT_DIR$/interfaces/request.go" />
         <option value="$PROJECT_DIR$/helper/list.go" />
         <option value="$PROJECT_DIR$/helper/slice.go" />
-        <option value="$PROJECT_DIR$/types/structure.go" />
-        <option value="$PROJECT_DIR$/types/message.go" />
-        <option value="$PROJECT_DIR$/types/request.go" />
-        <option value="$PROJECT_DIR$/app/messenger/messenger.go" />
-        <option value="$PROJECT_DIR$/app/replication.go" />
         <option value="$PROJECT_DIR$/.gitignore" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectConfigurationFiles">
-    <option name="files">
-      <list>
-        <option value="$PROJECT_DIR$/.idea/vcs.xml" />
+        <option value="$PROJECT_DIR$/variables/variables.go" />
+        <option value="$PROJECT_DIR$/config/scenario.go" />
+        <option value="$PROJECT_DIR$/types/helper/slice.go" />
+        <option value="$PROJECT_DIR$/types/helper/list.go" />
+        <option value="$PROJECT_DIR$/types/list_helper.go" />
+        <option value="$PROJECT_DIR$/app/faildetect.go" />
+        <option value="$PROJECT_DIR$/app/viewchange.go" />
+        <option value="$PROJECT_DIR$/app/replication.go" />
+        <option value="$PROJECT_DIR$/main.go" />
+        <option value="$PROJECT_DIR$/logger/logger.go" />
+        <option value="$PROJECT_DIR$/config/ip.go" />
+        <option value="$PROJECT_DIR$/types/clientmessage.go" />
+        <option value="$PROJECT_DIR$/types/vcm.go" />
+        <option value="$PROJECT_DIR$/types/message.go" />
+        <option value="$PROJECT_DIR$/types/structure.go" />
+        <option value="$PROJECT_DIR$/types/token.go" />
+        <option value="$PROJECT_DIR$/types/request.go" />
+        <option value="$PROJECT_DIR$/app/crdautom.go" />
+        <option value="$PROJECT_DIR$/app/messenger/messenger.go" />
+        <option value="$PROJECT_DIR$/app/establishment.go" />
+        <option value="$PROJECT_DIR$/types/coordination.go" />
+        <option value="$PROJECT_DIR$/types/view.go" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="61" />
-    <option name="y" value="32" />
-    <option name="width" value="649" />
-    <option name="height" value="736" />
+    <option name="x" value="65" />
+    <option name="y" value="24" />
+    <option name="width" value="651" />
+    <option name="height" value="744" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -212,6 +242,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -219,11 +250,15 @@
               <item name="SSBFT" type="b2602c69:ProjectViewProjectNode" />
               <item name="SSBFT" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="SSBFT" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SSBFT" type="462c0819:PsiDirectoryNode" />
+              <item name="types" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -244,16 +279,16 @@
     <property name="settings.editor.selected.configurable" value="com.goide.configuration.GoLibrariesConfigurableProvider" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/common" />
-      <recent name="$PROJECT_DIR$/replication" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/types" />
+      <recent name="$PROJECT_DIR$/types/helper" />
       <recent name="$PROJECT_DIR$/variables" />
       <recent name="$PROJECT_DIR$/var" />
       <recent name="$PROJECT_DIR$/common" />
-      <recent name="$PROJECT_DIR$/app" />
-      <recent name="$PROJECT_DIR$/common/message" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/common" />
+      <recent name="$PROJECT_DIR$/replication" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -356,14 +391,13 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="64" y="-11" width="1303" height="780" extended-state="6" />
-    <editor active="true" />
+    <frame x="65" y="-4" width="1301" height="772" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.30996016" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.35219124" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32786885" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32735425" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.49925262" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -372,7 +406,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.4996016" visible="true" weight="0.44245142" />
+      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.4996016" weight="0.44245142" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.5003984" side_tool="true" weight="0.46199703" />
       <window_info anchor="bottom" id="Inspection Results" order="12" weight="0.32935917" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -381,12 +415,12 @@
       <window_info anchor="right" id="Database" order="3" weight="0.32988048" />
     </layout>
     <layout-to-restore>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.30438247" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.35219124" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32786885" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.49925485" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32735425" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.49925262" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -394,7 +428,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.4996016" weight="0.44262296" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.4996016" visible="true" weight="0.44245142" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.5003984" side_tool="true" weight="0.46199703" />
       <window_info anchor="bottom" id="Inspection Results" order="12" weight="0.32935917" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -406,15 +440,18 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/app/replication.go</url>
+          <line>2</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/common/vcm/vstatus/vstatus.go" />
-    <entry file="file://$PROJECT_DIR$/../github.com/pebbe/zmq4/draft/zmq4.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="354">
-          <caret line="1009" column="17" lean-forward="true" selection-start-line="1009" selection-start-column="17" selection-end-line="1009" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/local/go/src/net/iprawsock.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2894">
@@ -518,96 +555,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logger/logger.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="560">
-          <caret line="26" column="34" selection-start-line="26" selection-start-column="34" selection-end-line="26" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/messenger/messenger_test.go" />
     <entry file="file://$PROJECT_DIR$/app/crdautom_test.go" />
     <entry file="file://$PROJECT_DIR$/app/establishment_test.go" />
-    <entry file="file://$PROJECT_DIR$/types/coordination.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="339">
-          <caret line="98" column="19" selection-start-line="98" selection-start-column="19" selection-end-line="98" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/types/view.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="9" column="7" lean-forward="true" selection-start-line="9" selection-start-column="7" selection-end-line="9" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/crdautom.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5152">
-          <caret line="191" lean-forward="true" selection-start-line="191" selection-end-line="191" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/viewchange.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/variables/variables.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="392">
-          <caret line="14" column="9" selection-start-line="14" selection-start-column="9" selection-end-line="14" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config/ip.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="451">
-          <caret line="20" column="71" selection-start-line="20" selection-start-column="71" selection-end-line="20" selection-end-column="71" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="16" column="24" lean-forward="true" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/local/go/src/container/list/list.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="206">
           <caret line="47" column="5" selection-start-line="47" selection-start-column="5" selection-end-line="47" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/types/clientmessage.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-235">
-          <caret line="19" column="19" selection-start-line="19" selection-start-column="19" selection-end-line="19" selection-end-column="19" />
-          <folding>
-            <element signature="e#15#50#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/types/vcm.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="7" column="5" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
-          <folding>
-            <element signature="e#15#50#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/local/go/src/time/time.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3566">
-          <caret line="126" column="5" selection-start-line="126" selection-start-column="5" selection-end-line="126" selection-end-column="5" />
         </state>
       </provider>
     </entry>
@@ -621,44 +575,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/establishment.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="206">
-          <caret line="48" column="19" selection-start-line="48" selection-start-column="19" selection-end-line="48" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/interfaces/request.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="112">
           <caret line="4" column="31" selection-start-line="4" selection-start-column="31" selection-end-line="4" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/helper/list.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="395">
-          <caret line="37" column="14" lean-forward="true" selection-start-line="37" selection-start-column="14" selection-end-line="37" selection-end-column="14" />
-          <folding>
-            <element signature="e#16#59#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/helper/slice.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="143">
-          <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/types/token.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="9" column="9" selection-start-line="9" selection-start-column="9" selection-end-line="9" selection-end-column="9" />
-          <folding>
-            <element signature="e#15#50#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -669,20 +589,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/types/structure.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="46">
-          <caret line="81" column="5" selection-start-line="81" selection-start-column="5" selection-end-line="81" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/faildetect.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="10" selection-start-column="8" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/local/go/src/go/token/token.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="700">
@@ -690,38 +596,173 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/types/request.go">
+    <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="206">
-          <caret line="94" column="5" selection-start-line="94" selection-start-column="5" selection-end-line="94" selection-end-column="5" />
+        <state>
+          <caret column="6" selection-start-column="6" selection-end-column="6" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/types/message.go">
+    <entry file="file://$PROJECT_DIR$/config/scenario.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="35" selection-start-line="35" selection-end-line="35" />
+        <state relative-caret-position="252">
+          <caret line="9" column="10" selection-start-line="9" selection-start-column="10" selection-end-line="9" selection-end-column="10" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/messenger/messenger.go">
+    <entry file="file://$PROJECT_DIR$/types/slice_helper.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="175" column="9" selection-start-line="175" selection-start-column="9" selection-end-line="175" selection-end-column="9" />
+        <state relative-caret-position="56">
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/types/list_helper.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="56">
+          <caret line="2" column="8" lean-forward="true" selection-start-line="2" selection-start-column="8" selection-end-line="2" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/go/src/strconv/atoi.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="214">
+          <caret line="201" column="5" selection-start-line="201" selection-start-column="5" selection-end-line="201" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/variables/variables.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="24" column="4" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/faildetect.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/replication.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="107" column="34" selection-start-line="107" selection-start-column="34" selection-end-line="107" selection-end-column="34" />
+        <state relative-caret-position="395">
+          <caret line="631" column="41" selection-start-line="631" selection-start-column="41" selection-end-line="631" selection-end-column="41" />
+          <folding>
+            <element signature="e#13#127#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
+    <entry file="file://$PROJECT_DIR$/logger/logger.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="6" selection-start-column="6" selection-end-column="6" />
+        <state relative-caret-position="140">
+          <caret line="18" column="19" selection-start-line="18" selection-start-column="19" selection-end-line="18" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="28" column="25" selection-start-line="28" selection-start-column="25" selection-end-line="28" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/ip.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="155">
+          <caret line="35" column="11" selection-start-line="35" selection-start-column="11" selection-end-line="35" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/go/src/time/time.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="1250" column="53" selection-start-line="1250" selection-start-column="53" selection-end-line="1250" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/types/structure.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="108" column="12" selection-start-line="108" selection-start-column="12" selection-end-line="108" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/types/message.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="241">
+          <caret line="35" column="1" selection-start-line="35" selection-start-column="1" selection-end-line="35" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/types/token.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="560">
+          <caret line="42" selection-start-line="42" selection-end-line="42" />
+          <folding>
+            <element signature="e#15#50#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/types/clientmessage.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-448">
+          <caret line="9" column="12" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/types/request.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="337">
+          <caret line="88" column="23" selection-start-line="88" selection-start-column="23" selection-end-line="88" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/messenger/messenger.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7000">
+          <caret line="259" column="17" selection-start-line="259" selection-start-column="17" selection-end-line="259" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/viewchange.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="11" column="19" selection-start-line="11" selection-start-column="19" selection-end-line="11" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/types/vcm.go">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/crdautom.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4200">
+          <caret line="157" column="39" selection-start-line="157" selection-start-column="39" selection-end-line="157" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/establishment.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3976">
+          <caret line="145" column="12" selection-start-line="145" selection-start-column="12" selection-end-line="145" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/types/coordination.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="12" column="24" selection-start-line="12" selection-start-column="24" selection-end-line="12" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/types/view.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="421">
+          <caret line="105" column="3" selection-start-line="105" selection-start-column="3" selection-end-line="105" selection-end-column="3" />
         </state>
       </provider>
     </entry>

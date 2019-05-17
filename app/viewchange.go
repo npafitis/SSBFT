@@ -9,7 +9,14 @@ import (
 	"encoding/gob"
 )
 
-var vcm = make([]*types.VCM, variables.N)
+var vcm []*types.VCM
+
+func InitializeViewChange(){
+	vcm = make([]*types.VCM, variables.N)
+	for i:= range vcm {
+		vcm[i] = new(types.VCM)
+	}
+}
 
 func defState() *types.VCM {
 	return &types.VCM{VStatus: types.OK, Prim: GetView(variables.Id), NeedChange: false, NeedChgSet: make([]int, 0)}

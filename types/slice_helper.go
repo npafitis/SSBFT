@@ -1,9 +1,7 @@
-package helper
+package types
 
-import "SSBFT/types"
-
-func ExcludeRequests(src []*types.Request, target []*types.Request) []*types.Request {
-	out := make([]*types.Request, 0)
+func ExcludeRequests(src []*Request, target []*Request) []*Request {
+	out := make([]*Request, 0)
 	copy(out, src)
 	for i, s := range out {
 	inner:
@@ -17,8 +15,8 @@ func ExcludeRequests(src []*types.Request, target []*types.Request) []*types.Req
 	return out
 }
 
-func FilterRequests(src []*types.Request, filterFn func(request *types.Request) bool) []*types.Request {
-	out := make([]*types.Request, 0)
+func FilterRequests(src []*Request, filterFn func(request *Request) bool) []*Request {
+	out := make([]*Request, 0)
 	for _, s := range src {
 		if !filterFn(s) {
 			out = append(out, s)
@@ -27,10 +25,10 @@ func FilterRequests(src []*types.Request, filterFn func(request *types.Request) 
 	return out
 }
 
-func FilterRequestStatus(src []*types.RequestStatus,
-	filterFn func(rs *types.RequestStatus) bool,
-) []*types.RequestStatus {
-	out := make([]*types.RequestStatus, 0)
+func FilterRequestStatus(src []*RequestStatus,
+	filterFn func(rs *RequestStatus) bool,
+) []*RequestStatus {
+	out := make([]*RequestStatus, 0)
 	for _, s := range src {
 		if !filterFn(s) {
 			out = append(out, s)
@@ -39,7 +37,7 @@ func FilterRequestStatus(src []*types.RequestStatus,
 	return out
 }
 
-func RLogEquals(rl1 []*types.LogTuple, rl2 []*types.LogTuple) bool {
+func RLogEquals(rl1 []*LogTuple, rl2 []*LogTuple) bool {
 	if len(rl1) != len(rl2) {
 		return false
 	}
@@ -51,7 +49,7 @@ func RLogEquals(rl1 []*types.LogTuple, rl2 []*types.LogTuple) bool {
 	return true
 }
 
-func LastReqEquals(lr1 []*types.RequestReply, lr2 []*types.RequestReply) bool {
+func LastReqEquals(lr1 []*RequestReply, lr2 []*RequestReply) bool {
 	if len(lr1) != len(lr2) {
 		return false
 	}

@@ -2,11 +2,11 @@ package app
 
 import (
 	"SSBFT/app/messenger"
+	"SSBFT/logger"
 	"SSBFT/types"
 	"SSBFT/variables"
 	"bytes"
 	"encoding/gob"
-	"log"
 )
 
 /**
@@ -151,10 +151,10 @@ func CoordinatingAutomaton() {
 				continue
 			}
 			this := &types.CoordinationMessage{
-				Phase:   phase(variables.Id),
-				Witness: witnesses[variables.Id],
-				Pair:    GetInfo(variables.Id),
-				Views:   views, // TODO This is not written in the algorithm description but might be necessary
+				Phase:       phase(variables.Id),
+				Witness:     witnesses[variables.Id],
+				ViewVChange: GetInfo(variables.Id),
+				Views:       views, // TODO This is not written in the algorithm description but might be necessary
 				LastReport: &types.LastReport{
 					Phase:   phase(i),
 					Witness: witnesses[i],
@@ -165,7 +165,7 @@ func CoordinatingAutomaton() {
 			encoder := gob.NewEncoder(w)
 			err := encoder.Encode(this)
 			if err != nil {
-				log.Fatal(err)
+				logger.ErrLogger.Fatal(err)
 			}
 			message := types.Message{Payload: w.Bytes(), Type: "CoordinationMessage", From: variables.Id}
 			messenger.SendMessage(message, i)
@@ -182,10 +182,20 @@ func handleCoordination() {
 			echo[message.From] = &types.AutomatonInfo{
 				Phase:   message.Message.Phase,
 				Witness: message.Message.Witness,
-				View:    message.Message.Pair.View.Cur, // TODO: wherever there's view it's possible it should be VPair instead of int
-				VChange: message.Message.Pair.ViewChange,
+				View:    message.Message.ViewVChange.View.Cur, // TODO: wherever there's view it's possible it should be VPair instead of int
+				VChange: message.Message.ViewVChange.ViewChange,
 			}
 			SetInfo(message.Message, message.From)
 		}
 	}
+}
+
+func InitializeAutomaton() {
+	phs = make([]types.Phase, variables.N)
+	witnesses = make([]bool, variables.N)
+	echo = make([]*types.AutomatonInfo, variables.N)
+	for i := range echo {
+		echo[i] = &types.AutomatonInfo{View: 0, Phase: types.ZERO, VChange: false, Witness: false}
+	}
+	witnessSet = make([]int, 0)
 }

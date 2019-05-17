@@ -6,16 +6,22 @@ import (
 	"SSBFT/config"
 	"SSBFT/logger"
 	"SSBFT/variables"
+	"log"
 	"os"
 	"os/signal"
 	"strconv"
 )
 
-func Initialise(id int, n int) {
-	variables.Initialise(id, n)
-	logger.Initialise()
-	config.Initialise(n)
-	messenger.Initialise()
+func Initialise(id int, n int, t int, k int) {
+	variables.Initialise(id, n, t, k)
+	logger.InitialiseLogger()
+	config.InitialiseIP(n)
+	messenger.InitialiseMessenger()
+	app.InitializeAutomaton()
+	app.InitializeViewChange()
+	app.InitializeFailureDetector()
+	app.InitializeEstablishment()
+	app.InitializeReplication()
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
@@ -35,15 +41,18 @@ func Initialise(id int, n int) {
 func main() {
 	done := make(chan interface{})
 	args := os.Args[1:]
-	if len(args) < 2 {
-		logger.ErrLogger.Fatal("Arguments should be 'ssbft <id> <n> <f>...")
+	if len(args) < 4 {
+		log.Fatal("Arguments should be 'ssbft <id> <n> <f>...")
 	}
 	id, _ := strconv.Atoi(args[0])
 	n, _ := strconv.Atoi(args[1])
+	t, _ := strconv.Atoi(args[2])
+	k, _ := strconv.Atoi(args[3])
 
-	Initialise(id, n)
+	Initialise(id, n, t, k)
 	messenger.Subscribe()
 
+	go messenger.TransmitMessages()
 	go app.ByzantineReplication()
 	go app.ViewChangeMonitor()
 	go app.CoordinatingAutomaton()

@@ -1,7 +1,7 @@
 package types
 
 import (
-	"SSBFT/helper"
+	"SSBFT/logger"
 	"bytes"
 	"container/list"
 	"encoding/gob"
@@ -26,11 +26,11 @@ func (lt *LogTuple) GobDecode(buf []byte) error {
 	decoder := gob.NewDecoder(r)
 	err := decoder.Decode(&lt.Req)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&lt.XSet)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	return nil
 }
@@ -40,11 +40,11 @@ func (lt *LogTuple) GobEncode() ([]byte, error) {
 	encoder := gob.NewEncoder(w)
 	err := encoder.Encode(lt.Req)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(lt.XSet)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	return w.Bytes(), nil
 }
@@ -92,14 +92,13 @@ type ReplicaStructure struct {
 
 func (rs *ReplicaStructure) Equals(repl *ReplicaStructure) bool {
 	return rs.RepState.Equals(repl.RepState) &&
-		helper.RLogEquals(rs.RLog, repl.RLog) &&
-		helper.ListEquals(rs.PendReqs, repl.PendReqs) &&
-		helper.ListEquals(rs.ReqQ, repl.ReqQ) &&
-		helper.LastReqEquals(rs.LastReq, repl.LastReq) &&
+		RLogEquals(rs.RLog, repl.RLog) &&
+		ListEquals(rs.PendReqs, repl.PendReqs) &&
+		ListEquals(rs.ReqQ, repl.ReqQ) &&
+		LastReqEquals(rs.LastReq, repl.LastReq) &&
 		rs.ConFlag == repl.ConFlag &&
 		rs.ViewChanged == repl.ViewChanged &&
 		rs.Prim == repl.Prim
-
 }
 
 func (rs *ReplicaStructure) GobDecode(buf []byte) error {
@@ -107,16 +106,16 @@ func (rs *ReplicaStructure) GobDecode(buf []byte) error {
 	decoder := gob.NewDecoder(read)
 	err := decoder.Decode(&rs.RepState)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&rs.RLog)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	var pendReqs []*Request
 	err = decoder.Decode(&pendReqs)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	rs.PendReqs = list.New()
 	for _, req := range pendReqs {
@@ -130,19 +129,19 @@ func (rs *ReplicaStructure) GobDecode(buf []byte) error {
 	}
 	err = decoder.Decode(&rs.LastReq)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&rs.ConFlag)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&rs.ViewChanged)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = decoder.Decode(&rs.Prim)
 	if err != nil {
-		return err
+		logger.ErrLogger.Fatal(err)
 	}
 	return nil
 }
@@ -152,11 +151,11 @@ func (rs *ReplicaStructure) GobEncode() ([]byte, error) {
 	encoder := gob.NewEncoder(w)
 	err := encoder.Encode(rs.RepState)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(rs.RLog)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	var pendReqs []*Request
 	for e := rs.PendReqs.Front(); e != nil; e = e.Next() {
@@ -164,7 +163,7 @@ func (rs *ReplicaStructure) GobEncode() ([]byte, error) {
 	}
 	err = encoder.Encode(pendReqs)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	var reqQ []*RequestStatus
 	for e := rs.ReqQ.Front(); e != nil; e = e.Next() {
@@ -172,23 +171,23 @@ func (rs *ReplicaStructure) GobEncode() ([]byte, error) {
 	}
 	err = encoder.Encode(reqQ)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(rs.LastReq)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(rs.ConFlag)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(rs.ViewChanged)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	err = encoder.Encode(rs.Prim)
 	if err != nil {
-		return nil, err
+		logger.ErrLogger.Fatal(err)
 	}
 	return w.Bytes(), nil
 }

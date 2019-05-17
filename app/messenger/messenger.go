@@ -20,6 +20,13 @@ var (
 
 	serverSockets map[int]*zmq4.Socket
 
+	replyChan map[int]chan interface{}
+
+	messageChan = make(chan struct {
+		Message types.Message
+		To      int
+	})
+
 	CoordChan = make(chan struct {
 		Message *types.CoordinationMessage
 		From    int
@@ -43,7 +50,11 @@ var (
 	}, 100)
 )
 
-func Initialise() {
+func InitialiseMessenger() {
+	replyChan = make(map[int]chan interface{}, variables.K)
+	for i := 0; i < variables.K; i++ {
+		replyChan[i] = make(chan interface{})
+	}
 	Context, err := zmq4.NewContext()
 	if err != nil {
 		logger.ErrLogger.Fatal(err)
@@ -102,21 +113,34 @@ func Broadcast(message types.Message) {
 	}
 }
 
+func TransmitMessages() {
+	for messageTo := range messageChan {
+		to := messageTo.To
+		message := messageTo.Message
+		w := new(bytes.Buffer)
+		encoder := gob.NewEncoder(w)
+		err := encoder.Encode(message)
+		if err != nil {
+			logger.ErrLogger.Fatal(err)
+		}
+		_, err = SndSockets[to].SendBytes(w.Bytes(), 0)
+		logger.OutLogger.Println("SENT Message to ", to)
+		if err != nil {
+			logger.ErrLogger.Fatal(err)
+		}
+		_, err = SndSockets[to].Recv(0)
+		if err != nil {
+			logger.ErrLogger.Fatal(err)
+		}
+		logger.OutLogger.Println("OKAY FROM ", to)
+	}
+}
+
 func SendMessage(message types.Message, to int) {
-	w := new(bytes.Buffer)
-	encoder := gob.NewEncoder(w)
-	err := encoder.Encode(message)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	_, err = SndSockets[to].SendBytes(w.Bytes(), 0)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	_, err = SndSockets[to].Recv(0)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
+	messageChan <- struct {
+		Message types.Message
+		To      int
+	}{Message: message, To: to}
 }
 
 func SendReplica(replica *types.ReplicaStructure, to int) {
@@ -139,6 +163,7 @@ func Subscribe() {
 					logger.ErrLogger.Fatal(err)
 				}
 				go handleRequest(message)
+				_ = <-replyChan[i]
 			}
 		}(i)
 	}
@@ -168,6 +193,7 @@ func handleRequest(msg []byte) {
 	decoder := gob.NewDecoder(buffer)
 	err := decoder.Decode(&cm)
 	if err != nil {
+		logger.ErrLogger.Println(len(msg))
 		logger.ErrLogger.Fatal(err)
 	}
 	RequestChan <- cm
@@ -192,6 +218,7 @@ func ReplyClient(reply *types.Reply) {
 	if err != nil {
 		logger.ErrLogger.Fatal(err)
 	}
+	replyChan[to] <- struct{}{}
 }
 
 func handleMessage(msg []byte) {
@@ -205,8 +232,11 @@ func handleMessage(msg []byte) {
 	switch message.Type {
 	case "CoordinationMessage":
 		coordination := new(types.CoordinationMessage)
-		err = decoder.Decode(&coordination)
+		buf := bytes.NewBuffer(message.Payload)
+		dec := gob.NewDecoder(buf)
+		err = dec.Decode(&coordination)
 		if err != nil {
+			logger.ErrLogger.Println(len(message.Payload))
 			logger.ErrLogger.Fatal(err)
 		}
 		CoordChan <- struct {
@@ -216,7 +246,9 @@ func handleMessage(msg []byte) {
 		break
 	case "VCM":
 		vcm := new(types.VCM)
-		err = decoder.Decode(&vcm)
+		buf := bytes.NewBuffer(message.Payload)
+		dec := gob.NewDecoder(buf)
+		err = dec.Decode(&vcm)
 		if err != nil {
 			logger.ErrLogger.Fatal(err)
 		}
@@ -227,7 +259,9 @@ func handleMessage(msg []byte) {
 		break
 	case "Token":
 		token := new(types.Token)
-		err = decoder.Decode(&token)
+		buf := bytes.NewBuffer(message.Payload)
+		dec := gob.NewDecoder(buf)
+		err = dec.Decode(&token)
 		if err != nil {
 			logger.ErrLogger.Fatal(err)
 		}
@@ -238,7 +272,9 @@ func handleMessage(msg []byte) {
 		break
 	case "ReplicaStructure":
 		replica := new(types.ReplicaStructure)
-		err = decoder.Decode(&replica)
+		buf := bytes.NewBuffer(message.Payload)
+		dec := gob.NewDecoder(buf)
+		err = dec.Decode(&replica)
 		if err != nil {
 			logger.ErrLogger.Fatal(err)
 		}
