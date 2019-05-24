@@ -11,9 +11,9 @@ import (
 
 var vcm []*types.VCM
 
-func InitializeViewChange(){
+func InitializeViewChange() {
 	vcm = make([]*types.VCM, variables.N)
-	for i:= range vcm {
+	for i := range vcm {
 		vcm[i] = new(types.VCM)
 	}
 }
@@ -30,6 +30,7 @@ func NoViewChange() bool {
 }
 
 func ViewChangeMonitor() {
+	go handleVCM()
 	for {
 		if vcm[variables.Id].Prim != GetView(variables.Id) {
 			cleanState()
@@ -91,6 +92,8 @@ func cleanState() {
 	}
 }
 
+// TODO check correctness here
+
 func supChange(x int) bool {
 	for i := 0; i < variables.N; i++ {
 		var set []int
@@ -108,4 +111,12 @@ func supChange(x int) bool {
 		}
 	}
 	return false
+}
+
+func handleVCM() {
+	for {
+		msg := <-messenger.VcmChan
+		from := msg.From
+		*vcm[from] = msg.Vcm
+	}
 }

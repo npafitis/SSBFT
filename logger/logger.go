@@ -37,6 +37,9 @@ func InitialiseLogger() {
 		outFolder += "byzantine_prim/out/"
 		errFolder += "byzantine_prim/err/"
 		break
+	case config.NON_SS:
+		outFolder += "non_ss/out/"
+		errFolder += "non_ss/err/"
 	}
 	output := outFolder + "output_" + strconv.Itoa(variables.Id) + "_" + time.Now().UTC().String() + ".txt"
 	errorf := errFolder + "err_" + strconv.Itoa(variables.Id) + "_" + time.Now().UTC().String() + ".txt"

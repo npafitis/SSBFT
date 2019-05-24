@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"github.com/pebbe/zmq4"
+	"log"
 	"strings"
 )
 
@@ -18,9 +19,13 @@ var (
 
 	SndSockets map[int]*zmq4.Socket
 
-	serverSockets map[int]*zmq4.Socket
+	ServerSockets map[int]*zmq4.Socket
 
-	replyChan map[int]chan interface{}
+	SendRecvSync map[int]chan interface{}
+
+	ResponseSockets map[int]*zmq4.Socket
+
+	//requestsChan map[int]chan interface{}
 
 	messageChan = make(chan struct {
 		Message types.Message
@@ -51,22 +56,39 @@ var (
 )
 
 func InitialiseMessenger() {
-	replyChan = make(map[int]chan interface{}, variables.K)
+	SendRecvSync = make(map[int]chan interface{}, variables.K)
 	for i := 0; i < variables.K; i++ {
-		replyChan[i] = make(chan interface{})
+		SendRecvSync[i] = make(chan interface{})
 	}
+
+	//requestsChan = make(map[int]chan interface{}, variables.K)
+	//for i := 0; i < variables.K; i++ {
+	//	requestsChan[i] = make(chan interface{}, 1)
+	//}
+
 	Context, err := zmq4.NewContext()
 	if err != nil {
 		logger.ErrLogger.Fatal(err)
 	}
-	serverSockets = make(map[int]*zmq4.Socket, variables.K)
+	ServerSockets = make(map[int]*zmq4.Socket, variables.K)
+	ResponseSockets = make(map[int]*zmq4.Socket, variables.K)
 	for i := 0; i < variables.K; i++ {
-		serverSockets[i], err = Context.NewSocket(zmq4.REP)
+		ServerSockets[i], err = Context.NewSocket(zmq4.REP)
 		if err != nil {
 			logger.ErrLogger.Fatal(err)
 		}
 		serverAddr := config.GetServerAddress(i)
-		err = serverSockets[i].Bind(serverAddr)
+		err = ServerSockets[i].Bind(serverAddr)
+		if err != nil {
+			logger.ErrLogger.Fatal(err)
+		}
+
+		ResponseSockets[i], err = Context.NewSocket(zmq4.PUB)
+		if err != nil {
+			logger.ErrLogger.Fatal(err)
+		}
+		responseAddr := config.GetResponseAddress(i)
+		err = ResponseSockets[i].Bind(responseAddr)
 		if err != nil {
 			logger.ErrLogger.Fatal(err)
 		}
@@ -158,13 +180,18 @@ func Subscribe() {
 	for i := 0; i < variables.K; i++ {
 		go func(i int) {
 			for {
-				message, err := serverSockets[i].RecvBytes(0)
+				message, err := ServerSockets[i].RecvBytes(0)
 				if err != nil {
 					logger.ErrLogger.Fatal(err)
 				}
 				logger.OutLogger.Println("Request Received")
-				go handleRequest(message)
-				_ = <-replyChan[i]
+				handleRequest(message)
+				_, err = ServerSockets[i].Send("", 0)
+				if err != nil {
+					logger.ErrLogger.Fatal(err)
+				}
+				//_ = <-SendRecvSync[i]
+				//requestsChan[i] <- struct{}{}
 			}
 		}(i)
 	}
@@ -210,18 +237,22 @@ func ReplyClient(reply *types.Reply) {
 		logger.ErrLogger.Fatal(err)
 	}
 	message := types.NewMessage(w.Bytes(), "Reply")
-	w = new(bytes.Buffer)
-	encoder = gob.NewEncoder(w)
-	err = encoder.Encode(message)
+
+	buf := new(bytes.Buffer)
+	enc := gob.NewEncoder(buf)
+
+	err = enc.Encode(message)
 	if err != nil {
 		logger.ErrLogger.Fatal(err)
 	}
-	_, err = serverSockets[to].SendBytes(w.Bytes(), 0)
+	//_ = <-requestsChan[to]
+	log.Printf("%s\n", string(reply.Result))
+	_, err = ResponseSockets[to].SendBytes(w.Bytes(), 0)
 	if err != nil {
 		logger.ErrLogger.Fatal(err)
 	}
 	logger.OutLogger.Println("Replied to Client.")
-	replyChan[to] <- struct{}{}
+	//SendRecvSync[to] <- struct{}{}
 }
 
 func handleMessage(msg []byte) {

@@ -11,6 +11,24 @@ func AppendIfMissingRequest(slice []*Request, i *Request) []*Request {
 	return append(slice, i)
 }
 
+func AppendIfMissingAcceptedRequest(slice []*AcceptedRequest, i *AcceptedRequest) []*AcceptedRequest {
+	for _, ele := range slice {
+		if ele.Equals(i) {
+			return slice
+		}
+	}
+	return append(slice, i)
+}
+
+func AppendIfMissingRequestStatus(slice []*RequestStatus, i *AcceptedRequest) []*RequestStatus {
+	for _, ele := range slice {
+		if ele.Req.Equals(i) {
+			return slice
+		}
+	}
+	return append(slice, &RequestStatus{Req: i})
+}
+
 func (tuples1 RLog) CommonPrefix(tuples2 RLog) RLog {
 	var logs RLog = make([]*LogTuple, 0)
 	var min RLog
@@ -29,14 +47,16 @@ func (tuples1 RLog) CommonPrefix(tuples2 RLog) RLog {
 
 func ExcludeRequests(src []*Request, target []*Request) []*Request {
 	out := make([]*Request, 0)
-	copy(out, src)
-	for i, s := range out {
-	inner:
+	for _, s := range src {
+		flag := true
 		for _, r := range target {
 			if s.Equals(r) {
-				out = append(out[:i], out[i+1:]...)
-				break inner
+				flag = false
+				break
 			}
+		}
+		if flag {
+			out = append(out, s)
 		}
 	}
 	return out
@@ -44,6 +64,16 @@ func ExcludeRequests(src []*Request, target []*Request) []*Request {
 
 func FilterRequests(src []*Request, filterFn func(request *Request) bool) []*Request {
 	out := make([]*Request, 0)
+	for _, s := range src {
+		if !filterFn(s) {
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
+func FilterAcceptedRequests(src []*AcceptedRequest, filterFn func(request *AcceptedRequest) bool) []*AcceptedRequest {
+	out := make([]*AcceptedRequest, 0)
 	for _, s := range src {
 		if !filterFn(s) {
 			out = append(out, s)

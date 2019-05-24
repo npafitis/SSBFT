@@ -19,9 +19,11 @@ Variables for Coordinating Automaton
 
 // Array of phase in {0, 1}
 var phs []types.Phase
+
 //witnesses[i] refers to the case where Pi observes that 4f+1
 //processors had noticed the most recent value of getInfo(i).
 var witnesses []bool
+
 // Set of processors Pj for which Pi received witnesses[j] = true
 var witnessSet []int
 
@@ -135,15 +137,13 @@ func CoordinatingAutomaton() {
 		if witnessSeen() {
 			c := 0
 			automaton, _ := Automaton(types.PRED, phase(variables.Id), c)
+
 			for !automaton || AutoMaxCase(phase(variables.Id)) >= c {
 				c++
 				automaton, _ = Automaton(types.PRED, phase(variables.Id), c)
 			}
 			if AutoMaxCase(phase(variables.Id)) >= c {
-				_, ret := Automaton(types.ACT, phase(variables.Id), c)
-				if ret != "No Action" && ret != "Reset" {
-					nextPhs()
-				}
+				_, _ = Automaton(types.ACT, phase(variables.Id), c)
 			}
 		}
 		for i := 0; i < variables.N; i++ {

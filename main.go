@@ -12,11 +12,13 @@ import (
 	"strconv"
 )
 
-func Initialise(id int, n int, t int, k int) {
+func Initialise(id int, n int, t int, k int, scenario config.Scenario) {
 	variables.Initialise(id, n, t, k)
 
-	logger.InitialiseLogger()
+	config.InitialiseIP(n)
+	config.InitialiseScenario(scenario)
 
+	logger.InitialiseLogger()
 	logger.OutLogger.Println(
 		"N", variables.N,
 		"ID", variables.Id,
@@ -24,8 +26,6 @@ func Initialise(id int, n int, t int, k int) {
 		"Threshold T", variables.T,
 		"Client Size", variables.K,
 	)
-
-	config.InitialiseIP(n)
 
 	messenger.InitialiseMessenger()
 
@@ -54,22 +54,23 @@ func Initialise(id int, n int, t int, k int) {
 func main() {
 	done := make(chan interface{})
 	args := os.Args[1:]
-	if len(args) < 4 {
-		log.Fatal("Arguments should be 'ssbft <id> <n> <f>...")
+	if len(args) < 5 {
+		log.Fatal("Arguments should be 'ssbft <id> <n> <f> <k> <scenario>")
 	}
 	id, _ := strconv.Atoi(args[0])
 	n, _ := strconv.Atoi(args[1])
 	t, _ := strconv.Atoi(args[2])
 	k, _ := strconv.Atoi(args[3])
+	tmp, _ := strconv.Atoi(args[4])
+	scenario := config.Scenario(tmp)
 
-	Initialise(id, n, t, k)
+	Initialise(id, n, t, k, scenario)
 	messenger.Subscribe()
 
 	go messenger.TransmitMessages()
-	go app.Monitor()
+	go app.FailDetector()
 	go app.ByzantineReplication()
 	go app.ViewChangeMonitor()
 	go app.CoordinatingAutomaton()
-
 	_ = <-done
 }

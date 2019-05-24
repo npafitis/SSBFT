@@ -13,11 +13,11 @@ type Operation struct {
 	Value rune
 }
 
-func (op Operation) Equals(operation Operation) bool {
+func (op *Operation) Equals(operation Operation) bool {
 	return op.Value == operation.Value && op.Op == operation.Op
 }
 
-func (op Operation) GobDecode(buf []byte) error {
+func (op *Operation) GobDecode(buf []byte) error {
 	r := bytes.NewBuffer(buf)
 	decoder := gob.NewDecoder(r)
 	err := decoder.Decode(&op.Op)
@@ -55,10 +55,6 @@ type Request struct {
 	Client    int
 	TimeStamp time.Time
 	Operation Operation
-}
-
-func (r *Request) ThisIsRequest() {
-	return
 }
 
 func (r *Request) GobDecode(buf []byte) error {
@@ -105,57 +101,59 @@ type Reply struct {
 	Result    RepState
 }
 
-func (rep *Reply) GobDecode(buf []byte) error {
-	r := bytes.NewBuffer(buf)
-	decoder := gob.NewDecoder(r)
-	err := decoder.Decode(&rep.View)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	err = decoder.Decode(&rep.TimeStamp)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	err = decoder.Decode(&rep.Client)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	err = decoder.Decode(&rep.Id)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	err = decoder.Decode(&rep.Result)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	return nil
-}
-
-func (rep *Reply) GobEncode() ([]byte, error) {
-	w := new(bytes.Buffer)
-	encoder := gob.NewEncoder(w)
-	err := encoder.Encode(rep.View)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	err = encoder.Encode(rep.TimeStamp)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	err = encoder.Encode(rep.Client)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	err = encoder.Encode(rep.Id)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	err = encoder.Encode(rep.Result)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	return w.Bytes(), nil
-}
+//func (rep *Reply) GobDecode(buf []byte) error {
+//	r := bytes.NewBuffer(buf)
+//	decoder := gob.NewDecoder(r)
+//
+//	err := decoder.Decode(&rep.View)
+//	if err != nil {
+//		return err
+//	}
+//	err = decoder.Decode(&rep.TimeStamp)
+//	if err != nil {
+//		return err
+//	}
+//	err = decoder.Decode(&rep.Client)
+//	if err != nil {
+//		return err
+//	}
+//	err = decoder.Decode(&rep.Id)
+//	if err != nil {
+//		return err
+//	}
+//	err = decoder.Decode(&rep.Result)
+//	if err != nil {
+//		return err
+//	}
+//
+//	return nil
+//}
+//
+//func (rep *Reply) GobEncode() ([]byte, error) {
+//	w := new(bytes.Buffer)
+//	encoder := gob.NewEncoder(w)
+//	err := encoder.Encode(rep.View)
+//	if err != nil {
+//		logger.ErrLogger.Fatal(err)
+//	}
+//	err = encoder.Encode(rep.TimeStamp)
+//	if err != nil {
+//		logger.ErrLogger.Fatal(err)
+//	}
+//	err = encoder.Encode(rep.Client)
+//	if err != nil {
+//		logger.ErrLogger.Fatal(err)
+//	}
+//	err = encoder.Encode(rep.Id)
+//	if err != nil {
+//		logger.ErrLogger.Fatal(err)
+//	}
+//	err = encoder.Encode(rep.Result)
+//	if err != nil {
+//		logger.ErrLogger.Fatal(err)
+//	}
+//	return w.Bytes(), nil
+//}
 
 type RequestReply struct {
 	Req    *Request // Request TODO []: Check between AcceptedRequest and Request
@@ -249,16 +247,19 @@ func (r *AcceptedRequest) GobEncode() ([]byte, error) {
 }
 
 func (r *Request) Equals(request *Request) bool {
-	return r.Client == request.Client && r.TimeStamp.Equal(request.TimeStamp) &&
-		r.Operation.Equals(request.Operation)
+	return r.Client == request.Client &&
+		r.Operation.Equals(request.Operation) &&
+		r.TimeStamp.Equal(request.TimeStamp)
 }
 
-func (rep *Reply) Equals(request *Reply) bool {
-	return rep.Client == request.Client && rep.TimeStamp.Equal(request.TimeStamp) &&
-		rep.Id == request.Id && rep.Result.Equals(request.Result)
+func (rep *Reply) Equals(reply *Reply) bool {
+	return rep.Client == reply.Client &&
+		rep.Id == reply.Id && rep.Result.Equals(reply.Result)
 }
 
 func (r *AcceptedRequest) Equals(req *AcceptedRequest) bool {
+	//("r.Sq=",r.Sq)
+	//("req.Sq=",req.Sq)
 	return r.Request.Equals(req.Request) && r.View == req.View &&
 		r.Sq == req.Sq
 }
@@ -282,5 +283,5 @@ func MergeRequestSets(r []*Request, q []*Request) []*Request {
 }
 
 func (rr *RequestReply) Equals(req *RequestReply) bool {
-	return rr.Req.Equals(req.Req) && (rr.Rep.Equals(rr.Rep) || rr.Rep == nil)
+	return rr.Req.Equals(req.Req) && (rr.Rep == nil || rr.Rep.Equals(rr.Rep))
 }

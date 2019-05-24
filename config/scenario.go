@@ -8,9 +8,10 @@ const (
 	STALE_STATES
 	BYZANTINE_PRIM
 	STALE_REQUESTS
+	NON_SS
 )
 
-var TestCase Scenario = NORMAL
+var TestCase = NORMAL
 
 func InitialiseScenario(scenario Scenario) {
 	TestCase = scenario

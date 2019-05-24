@@ -4,6 +4,7 @@ import (
 	"SSBFT/logger"
 	"SSBFT/types"
 	"SSBFT/variables"
+	"log"
 )
 
 /*
@@ -54,6 +55,7 @@ func ResetAll() string {
 
 func ViewChange() {
 	logger.OutLogger.Println("Change View")
+	log.Println("Change View")
 	vChange[variables.Id] = true
 }
 
@@ -82,6 +84,7 @@ func Automaton(t types.Type, p types.Phase, c int) (val bool, action string) {
 				if (v.Next != vp(variables.Id).Next) &&
 					v.Next != vp(variables.Id).Cur &&
 					val {
+					log.Println("HELLO LADIES")
 					return true, "Adopt this View"
 				}
 			}
@@ -91,45 +94,63 @@ func Automaton(t types.Type, p types.Phase, c int) (val bool, action string) {
 	case t == types.ACT && p == types.ZERO && c == 0:
 		adopt(vp(variables.Id))
 		resetVChange()
+		nextPhs()
+		break
 	case t == types.PRED && p == types.ZERO && c == 1:
 		val = vChange[variables.Id] && establishable(types.ZERO, types.Follow)
+		break
 	case t == types.ACT && p == types.ZERO && c == 1:
 		nextView()
+		nextPhs()
 		resetVChange()
+		break
 	case t == types.PRED && p == types.ZERO && c == 2:
 		val = transitAdopble(variables.Id, types.ZERO, types.Remain) || vp(variables.Id).Equals(RstPair())
+		break
 	case t == types.ACT && p == types.ZERO && c == 2:
 		action = "No Action"
+		break
 	case t == types.PRED && p == types.ZERO && c == 3:
 		val = true
+		break
 	case t == types.ACT && p == types.ZERO && c == 3:
 		action = ResetAll()
 		resetVChange()
+		break
 	case t == types.PRED && p == types.ONE && c == 0:
 		for i := range views {
 			val = transitAdopble(i, types.ONE, types.Follow)
 		}
 		val = val && (vp(variables.Id).Cur != vp(variables.Id).Next)
+		break
 	case t == types.ACT && p == types.ONE && c == 0:
 		adopt(vp(variables.Id))
 		resetVChange()
+		break
 	case t == types.PRED && p == types.ONE && c == 1:
 		val = establishable(p, types.Follow)
+		break
 	case t == types.ACT && p == types.ONE && c == 1:
 		if vp(variables.Id).Equals(RstPair()) {
 			ReplicaFlush()
 		}
 		establish()
+		nextPhs()
 		resetVChange()
+		break
 	case t == types.PRED && p == types.ONE && c == 2:
 		val = transitAdopble(variables.Id, p, types.Remain)
+		break
 	case t == types.ACT && p == types.ONE && c == 2:
 		action = "No Action"
+		break
 	case t == types.PRED && p == types.ONE && c == 3:
 		val = true
+		break
 	case t == types.ACT && p == types.ONE && c == 3:
 		action = ResetAll()
 		resetVChange()
+		break
 	}
 	return val, action
 }
@@ -247,10 +268,12 @@ func adopt(vPair types.VPair) {
 
 //TODO [ ]: *vp(types.Id).Cur might not be correct
 func establishable(ph types.Phase, mode types.Mode) bool {
-	return (len(sameVSet(vp(variables.Id).Cur, phase(variables.Id))) + len(transitSet(variables.Id, ph, mode))) >= 4*variables.F+1
+	return (len(sameVSet(vp(variables.Id).Cur, phase(variables.Id))) +
+		len(transitSet(variables.Id, ph, mode))) >= 4*variables.F+1
 }
 
 func establish() {
+	log.Println("Hello Ladies")
 	views[variables.Id].Cur = vp(variables.Id).Next
 }
 

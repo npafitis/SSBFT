@@ -1,6 +1,5 @@
 package variables
 
-
 var (
 	//Number of processors
 	N int
@@ -22,6 +21,9 @@ func Initialise(id int, n int, t int, k int) {
 	N = n
 	Id = id
 	F = (N - 1) / 5
+	if F == 0 {
+		F = 1
+	}
 	T = t
 	K = k
 }

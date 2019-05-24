@@ -2,11 +2,14 @@ package app
 
 import (
 	"SSBFT/app/messenger"
+	"SSBFT/config"
 	"SSBFT/logger"
 	"SSBFT/types"
 	"SSBFT/variables"
 	"container/list"
 	"errors"
+	"github.com/jinzhu/copier"
+	"log"
 	"math"
 	"reflect"
 	"time"
@@ -16,6 +19,7 @@ import (
 Constants
 */
 var MAXINT uint64
+
 /*****************/
 // Identifier(i) of processor p[i]
 //var types.Id int
@@ -31,10 +35,11 @@ var seqn int // [0, MAXINT]
 var rep []*types.ReplicaStructure
 var needFlush bool
 var flush bool
+
 //var types.Prim int
 
 func DEF_STATE() *types.ReplicaStructure {
-	return &types.ReplicaStructure{RepState: make([]rune, 0), RLog: make([]*types.LogTuple, 0), PendReqs: list.New(), ReqQ: list.New(), LastReq: make([]*types.RequestReply, 0), ConFlag: false, ViewChanged: false}
+	return &types.ReplicaStructure{RepState: make([]rune, 0), RLog: make([]*types.LogTuple, 0), PendReqs: list.New(), ReqQ: list.New(), LastReq: make([]*types.RequestReply, 0), ConFlag: false, ViewChanged: false, Prim: 0}
 }
 
 /*
@@ -46,9 +51,21 @@ func InitializeReplication() {
 	for i := range rep {
 		rep[i] = new(types.ReplicaStructure)
 		replica := DEF_STATE()
+		if variables.F == 0 {
+			log.Fatal("F is 0")
+		}
+		if variables.Id != 0 && variables.Id%(variables.N/variables.F) == 0 {
+			if config.TestCase == config.STALE_VIEWS {
+				replica.Prim = 1
+			}
+			if config.TestCase == config.STALE_STATES && i == variables.Id {
+				replica.RepState = []rune{'c', 'f'}
+			}
+		}
 		rep[i] = replica
 	}
-	Sigma = 1
+	seqn = 0
+	Sigma = 100
 	MAXINT = uint64(math.Pow(2, 64))
 	logger.OutLogger.Println("MaxInt =", MAXINT)
 	needFlush = false
@@ -123,7 +140,6 @@ func findConsState(S []types.RepState) struct {
 }
 
 /**
-TODO checkNewVstate()
 checkNewVstate() checks the state proposed by a newly installed primary after
 view change. This involves checking whether the proposed pre-prepare messages of committed
 processors are verified by another 3f+1 processors and the new state has a correct
@@ -134,12 +150,10 @@ func checkNewVState(id int) bool {
 	if !consState.RepState.PrefixRelation(rep[id].RepState) {
 		return false
 	}
-
 	return true
 }
 
 /**
-TODO renewReqs()
 renewReqs() is executed by a new primary, in order to issue a consistent set
 of pending requests messages for reqQ and pendReqs, where these are now allocated for execution
 to the new view.
@@ -206,13 +220,15 @@ messenger(status t, int j) returns all the requests the p[j]
 reported to p[i] that have a specific status or set of
 statuses
 */
-func msg(status []types.Status, j int) []*types.AcceptedRequest {
+func msg(j int, status ...types.Status) []*types.AcceptedRequest {
 	var messages []*types.AcceptedRequest
-
+	//("Msg ReqQ len=",rep[j].ReqQ.Len())
 	// Add to messages items that match status
 	for item := rep[j].ReqQ.Front(); item != nil; item = item.Next() {
 		element := item.Value.(*types.RequestStatus)
 		for _, st := range status {
+			//("element.St",element.St)
+			//("st",st)
 			if element.St == st {
 				messages = append(messages, element.Req)
 				break
@@ -450,25 +466,29 @@ queues of at least another 3f + 1 processors
 */
 func knownPendReqs() []*types.Request {
 	var returnReqs = make([]*types.Request, 0)
-	pendReqs := rep[variables.Id].PendReqs
-	for e := pendReqs.Front(); e != nil; e = e.Next() {
+	for e := rep[variables.Id].PendReqs.Front(); e != nil; e = e.Next() {
 		req := e.Value.(*types.Request)
 		count := 0
+	outer:
 		for _, rs := range rep {
 			if rs == rep[variables.Id] {
 				continue
 			}
-			var items []*types.Request
-			for el := rs.PendReqs.Front(); el != nil; el = el.Next() {
-				items = types.AppendIfMissingRequest(items, el.Value.(*types.Request))
-			}
-			for el := rs.ReqQ.Front(); el != nil; el = el.Next() {
-				items = types.AppendIfMissingRequest(items, el.Value.(*types.RequestStatus).Req.Request)
-			}
-			for _, item := range items {
-				if req.Equals(item) {
+			for element := rs.PendReqs.Front(); element != nil; element = element.Next() {
+				request := element.Value.(*types.Request)
+				if req.Equals(request) {
 					count++
+					continue outer
 				}
+
+			}
+			for element := rs.ReqQ.Front(); element != nil; element = element.Next() {
+				request := element.Value.(*types.RequestStatus)
+				if req.Equals(request.Req.Request) {
+					count++
+					continue outer
+				}
+
 			}
 		}
 		if count >= 3*variables.F+1 {
@@ -494,7 +514,7 @@ func knownReqs(set ...types.Status) []*types.RequestStatus {
 				statusFlag = true
 			}
 		}
-		if statusFlag {
+		if !statusFlag {
 			continue
 		}
 		count := 0
@@ -522,17 +542,25 @@ func knownReqs(set ...types.Status) []*types.RequestStatus {
 delayed() TODO: Check if LastCommonExec().Req.Sq is correct
 */
 func delayed() bool {
-	return lastExec() < (LastCommonExec().Req.Sq + 3*variables.K*Sigma)
+	lastCommonExec := LastCommonExec()
+	var sq int
+	if lastCommonExec == nil {
+		sq = 0
+	} else {
+		sq = lastCommonExec.Req.Sq
+	}
+	return lastExec() < (sq + 3*variables.K*Sigma)
 }
 
 /**
 existsPPrepMsg(x, processor)
 */
 func existsPPrepMsg(request *types.Request, processor int) bool {
-	var statuses []types.Status
-	statuses = append(statuses, types.PRE_PREP)
-	messages := msg(statuses, processor)
+	messages := msg(processor, types.PRE_PREP)
+	//("msg() len=",len(messages))
 	for _, msg := range messages {
+		//("msg", msg)
+		//("x", request)
 		if msg.Request.Equals(request) {
 			return true
 		}
@@ -551,18 +579,26 @@ func unassignedReqs() []*types.Request {
 	pendReqs := rep[variables.Id].PendReqs
 	for e := pendReqs.Front(); e != nil; e = e.Next() {
 		req := e.Value.(*types.Request)
-		exists := false
-		var st []types.Status
-		st = append(st, types.PREP)
-		st = append(st, types.COMMIT)
-		set := knownReqs(st...)
+		existsPrep := false
+		set := knownReqs(types.PREP, types.COMMIT)
+		//if variables.Id == 1 {
+		//
+		//	("Set",len(set))
+		//}
 		for _, rq := range set {
 			if rq.Req.Request.Equals(req) {
-				exists = true
+				existsPrep = true
 				break
 			}
 		}
-		if !existsPPrepMsg(req, rep[variables.Id].Prim) && !exists {
+		existsPrim := existsPPrepMsg(req, rep[variables.Id].Prim)
+		//for e := rep[rep[variables.Id].Prim].ReqQ.Front(); e != nil; e = e.Next() {
+		//	if e.Value.(*types.RequestStatus).St == types.PRE_PREP {
+		//		logger.OutLogger.Println("Something's fishy.")
+		//	}
+		//}
+		logger.OutLogger.Println("existsPrim", existsPrim)
+		if !existsPrim && !existsPrep {
 			returnReqs = append(returnReqs, req)
 		}
 	}
@@ -570,20 +606,19 @@ func unassignedReqs() []*types.Request {
 }
 
 /**
-acceptReqPPrep(x, types.Prim) returns True if there is a pre-prepare message
+acceptPPrepReq(x, types.Prim) returns True if there is a pre-prepare message
 from the primary Prim for a request x and the request
 content is the same for 3f + 1 processors with the same
-sequence number and view types.Identifier.
+sequence number and view identifier.
 */
-func acceptReqPPrep(x *types.Request, prim int) bool {
+func acceptPPrepReq(x *types.Request, prim int) (bool, int) {
 
 	isKnownPendReq := types.ContainsRequest(x, knownPendReqs())
 	logger.OutLogger.Println("isKnownPendReq =", isKnownPendReq)
 	if !isKnownPendReq {
-		logger.OutLogger.Println("isKnownPendReq =", isKnownPendReq)
-		return false
+		return false, 0
 	}
-	reqs := rep[variables.Id].ReqQ
+	reqs := rep[prim].ReqQ
 	for e := reqs.Front(); e != nil; e = e.Next() {
 		req := e.Value.(*types.RequestStatus).Req
 		isEqualReq := req.Request.Equals(x)
@@ -619,9 +654,9 @@ func acceptReqPPrep(x *types.Request, prim int) bool {
 				}
 			}
 		}
-		return true
+		return true, req.Sq
 	}
-	return false
+	return false, 0
 }
 
 /**
@@ -630,7 +665,7 @@ committedSet(x)
 func committedSet(x *types.AcceptedRequest) []int {
 	var committedSet []int
 	for i := range rep {
-		if types.ContainsAcceptedRequest(x, msg([]types.Status{types.COMMIT}, i)) ||
+		if types.ContainsAcceptedRequest(x, msg(i, types.COMMIT)) ||
 			types.ContainsAcceptedRequest(x, types.GetRequestsFromLog(rep[i].RLog)) {
 			committedSet = append(committedSet, i)
 		}
@@ -707,90 +742,142 @@ func ByzantineReplication() {
 		if AllowService() && !needFlush {
 			if NoViewChange() && !viewChanged() {
 				if rep[variables.Id].Prim == variables.Id {
-					for req := rep[variables.Id].PendReqs.Front(); req != nil; req = req.Next() {
-						if seqn < lastExec()+Sigma*variables.K {
-							// 3-phase commit Replication
-							reqSt := new(types.RequestStatus)
-							reqSt.Req = new(types.AcceptedRequest)
-							reqSt.Req.Request = req.Value.(*types.Request)
-							reqSt.Req.View = rep[variables.Id].Prim
-							seqn++
-							reqSt.Req.Sq = seqn
-							reqSt.St = types.PRE_PREP
-							rep[variables.Id].Add(reqSt)
+					if config.TestCase != config.BYZANTINE_PRIM && variables.Id == 0 {
+						for req := rep[variables.Id].PendReqs.Front(); req != nil; req = req.Next() {
+							request := req.Value.(*types.Request)
+							isUnassigned := false
+							for _, unassigned := range unassignedReqs() {
+								if unassigned.Equals(request) {
+									isUnassigned = true
+								}
+							}
+							if !isUnassigned {
+								continue
+							}
+							if seqn < lastExec()+Sigma*variables.K {
+								// 3-phase commit Replication
+								//("Seqn=",seqn)
+								if config.TestCase == config.STALE_REQUESTS && variables.Id == 0 {
+									request.Operation.Value = 'l'
+								}
+								reqSt := new(types.RequestStatus)
+								reqSt.Req = new(types.AcceptedRequest)
+								reqSt.Req.Request = request
+								reqSt.Req.View = rep[variables.Id].Prim
+								seqn++
+								reqSt.Req.Sq = seqn
+								reqSt.St = types.PRE_PREP
+								rep[variables.Id].Add(reqSt)
 
-							reqSt = new(types.RequestStatus)
-							reqSt.Req = new(types.AcceptedRequest)
-							reqSt.Req.Request = req.Value.(*types.Request)
-							reqSt.Req.View = rep[variables.Id].Prim
-							seqn++
-							reqSt.Req.Sq = seqn
-							reqSt.St = types.PREP
-							rep[variables.Id].Add(reqSt)
-
+								reqSt = new(types.RequestStatus)
+								reqSt.Req = new(types.AcceptedRequest)
+								reqSt.Req.Request = request
+								reqSt.Req.View = rep[variables.Id].Prim
+								//seqn++
+								reqSt.Req.Sq = seqn
+								reqSt.St = types.PREP
+								rep[variables.Id].Add(reqSt)
+							}
 						}
 					}
 				} else {
+					logger.OutLogger.Println("Accepting Sequence Numbers from Primary.")
+					logger.OutLogger.Println("KnownPendReqs Len=", len(knownPendReqs()))
+					logger.OutLogger.Println("UnassignedReqs Len=", len(unassignedReqs()))
 					reqs := types.ExcludeRequests(knownPendReqs(), unassignedReqs())
+					logger.OutLogger.Println("Examined Requests length =", len(reqs))
 					reqs = types.FilterRequests(reqs, func(request *types.Request) bool {
-						flag := false
-					outer:
-						for _, replica := range rep {
-							for reqSt := replica.ReqQ.Front(); reqSt != nil; reqSt = reqSt.Next() {
-								if reqSt.Value.(*types.AcceptedRequest).Request.Equals(request) {
-									flag = true
-									break outer
-								}
+						//for _, replica := range rep {
+						replica := rep[variables.Id]
+						for reqSt := replica.ReqQ.Front(); reqSt != nil; reqSt = reqSt.Next() {
+							requestStatus := reqSt.Value.(*types.RequestStatus)
+							//log.Println("this", requestStatus.Req.Sq)
+							//log.Println("that", request.Operation.Value)
+							if requestStatus.Req.Request.Equals(request) {
+								return true
 							}
 						}
-						return flag
+						//}
+						return false
+
 					})
-					logger.OutLogger.Println("Accepting Sequence Numbers from Primary.")
 					logger.OutLogger.Println("Examined Requests length =", len(reqs))
 					for _, x := range reqs {
 						logger.OutLogger.Println("Checking to Accept Request", x)
-						if acceptReqPPrep(x, rep[variables.Id].Prim) {
-							logger.OutLogger.Println("Accepting Request", x)
+						acceptReq, sq := acceptPPrepReq(x, rep[variables.Id].Prim)
+						if acceptReq {
 							rep[variables.Id].Add(
 								&types.RequestStatus{
-									Req: &types.AcceptedRequest{Request: x},
-									St:  types.PREP}) // TODO: Check how to add a simple request
-							rep[variables.Id].Add(
-								&types.RequestStatus{
-									Req: &types.AcceptedRequest{Request: x},
+									Req: &types.AcceptedRequest{Request: x, Sq: sq, View: rep[variables.Id].Prim},
 									St:  types.PRE_PREP})
+							rep[variables.Id].Add(
+								&types.RequestStatus{
+									Req: &types.AcceptedRequest{Request: x, Sq: sq, View: rep[variables.Id].Prim},
+									St:  types.PREP}) // TODO: Check how to add a simple request
 						}
 					}
-					for _, x := range knownReqs(types.PREP) {
-						x.St = types.COMMIT
-						rep[variables.Id].Remove(x.Req.Request)
+				}
+				for _, x := range knownReqs(types.PREP) {
+					x.St = types.COMMIT
+
+					rep[variables.Id].Remove(x.Req.Request)
+				}
+				//	if 3f + 1 commited then commit.
+				// TODO: Union or Section
+				reqQ := types.ToSliceRequestStatus(rep[variables.Id].ReqQ)
+				for _, log := range rep[variables.Id].RLog {
+					reqQ = types.AppendIfMissingRequestStatus(reqQ, log.Req)
+				}
+				//reqQ = types.FilterRequestStatus(reqQ, func(rs *types.RequestStatus) bool {
+				//	for _, logTuple := range rep[variables.Id].RLog{
+				//		if logTuple.Req.Equals(rs.Req){
+				//			return false
+				//		}
+				//	}
+				//	return true
+				//})
+
+				reqQ = types.FilterRequestStatus(reqQ, func(rs *types.RequestStatus) bool {
+					isKnownReq := false
+					for _, x := range knownReqs(types.PREP, types.COMMIT) {
+						if rs.Equals(x) {
+							isKnownReq = true
+							break
+						}
 					}
-					//	if 3f + 1 commited then commit.
-					// TODO: Union or Section
-					reqQ := types.ToSliceRequestStatus(rep[variables.Id].ReqQ)
-					reqQ = types.FilterRequestStatus(reqQ, func(rs *types.RequestStatus) bool {
-						for _, x := range knownReqs(types.PREP, types.COMMIT) {
-							if rs.Equals(x) {
-								return false
-							}
+					return !isKnownReq
+				})
+
+				for _, rs := range reqQ {
+					x := committedSet(rs.Req)
+					//if variables.Id == 0 {
+					//	log.Println("lastExec", rs.Req.Sq, lastExec()+1)
+					//	log.Println("Is Committed", len(x), len(x) >= 3*variables.F+1)
+					//}
+					if len(x) >= 3*variables.F+1 && rs.Req.Sq == lastExec()+1 { // TODO Check this part with Chryssis
+						if rs.St == types.PRE_PREP {
+							log.Fatal("PRE_PREP shouldn't be in commitedSet")
 						}
-						return true
-					})
-					for _, rs := range reqQ {
-						x := committedSet(rs.Req)
-						if len(x) > 3*variables.F+1 && rs.Req.Sq == lastExec()+1 { // TODO Check this part with Chryssis
-							rr := new(types.RequestReply)
-							rr.Req = rs.Req.Request
-							rr.Client = rs.Req.Request.Client
-							rr.Rep = apply(rs.Req.Request)
-							rep[variables.Id].Enqueue(rr)
-							ltuple := new(types.LogTuple)
-							ltuple.Req = rs.Req
-							ltuple.XSet = x
-							rep[variables.Id].Add(ltuple)
-							rep[variables.Id].Remove(rs.Req.Request)
-							rep[variables.Id].Remove(rs.Req) // TODO: Make sure this works properly
+						rr := new(types.RequestReply)
+						rr.Req = new(types.Request)
+						err := copier.Copy(rr.Req, rs.Req.Request)
+						if err != nil {
+							logger.ErrLogger.Fatal(err)
 						}
+						rr.Client = rs.Req.Request.Client
+						rr.Rep = new(types.Reply)
+						err = copier.Copy(rr.Rep, apply(rs.Req.Request))
+						if err != nil {
+							logger.ErrLogger.Fatal(err)
+						}
+						rep[variables.Id].Enqueue(rr)
+
+						ltuple := new(types.LogTuple)
+						ltuple.Req = rs.Req
+						ltuple.XSet = x
+						rep[variables.Id].Enqueue(ltuple)
+						rep[variables.Id].Remove(rs.Req.Request)
+						rep[variables.Id].Remove(rs.Req) // TODO: Make sure this works properly
 					}
 				}
 			}
@@ -799,29 +886,24 @@ func ByzantineReplication() {
 			if i == variables.Id {
 				continue
 			}
+			//if variables.Id==0{
+			//	(rep[variables.Id].ReqQ.Len())
+			//}
 			messenger.SendReplica(rep[variables.Id], i)
 		}
 		logger.OutLogger.Println("Size of LastReq = ", len(rep[variables.Id].LastReq))
 		logger.OutLogger.Println("Size of PendReqs = ", rep[variables.Id].PendReqs.Len())
 		logger.OutLogger.Println("Size of ReqQ = ", rep[variables.Id].ReqQ.Len())
 
-		for cl := 0; cl < variables.K; cl++ {
-			for _, lastReq := range rep[variables.Id].LastReq {
-				if lastReq.Client == cl {
-					messenger.ReplyClient(lastReq.Rep)
-				}
-			}
+		//if variables.Id == 0 {
+		//	log.Println("Size of LastReq = ", len(rep[variables.Id].LastReq))
+		//}
+		for i, lastReq := range rep[variables.Id].LastReq {
+			messenger.ReplyClient(lastReq.Rep)
+			rep[variables.Id].LastReq = append(rep[variables.Id].LastReq[:i], rep[variables.Id].LastReq[i+1:]...)
 		}
 	}
 }
-
-/*
-TODO: Check wherever
-if i == variables.Id {
-	continue
-}
-if necessary
-*/
 
 func countCommonPrimary() int {
 	count := 0
@@ -840,8 +922,12 @@ func handleReplicaMessages() {
 		replica := message.Rep
 		if AllowService() {
 			if NoViewChange() {
+				logger.OutLogger.Println("Updating replica of ", j, "with", replica)
+				logger.OutLogger.Println("PendReqs Length =", replica.PendReqs.Len())
+				logger.OutLogger.Println("ReqQ Length =", replica.ReqQ.Len())
 				rep[j] = replica
 			} else {
+				logger.OutLogger.Println("Updating State of ", j, "with", replica.RepState)
 				rep[j].RepState = replica.RepState
 			}
 		}
@@ -866,5 +952,13 @@ func handleRequest(req *types.Request) {
 }
 
 func handleAck(cm *types.ClientMessage) {
+	logger.OutLogger.Println("Ack Received.")
+	//_, err := messenger.ServerSockets[cm.Req.Client].Send("", 0)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//messenger.SendRecvSync[cm.Req.Client] <- struct{}{}
 	rep[variables.Id].Remove(&types.RequestReply{Req: cm.Req, Rep: nil})
+	//log.Println("ReqQ", rep[variables.Id].ReqQ.Len())
+	//log.Println("Sq", rep[variables.Id].ReqQ.Front().Value.(*types.RequestStatus).Req.Sq, "id", variables.Id, "lastExec", lastExec())
 }

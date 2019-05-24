@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"container/list"
 	"encoding/gob"
+	"log"
 	"reflect"
 )
 
@@ -74,6 +75,34 @@ type RequestStatus struct {
 	St  Status
 }
 
+func (rs *RequestStatus) GobEncode() ([]byte, error) {
+	w := new(bytes.Buffer)
+	encoder := gob.NewEncoder(w)
+	err := encoder.Encode(rs.Req)
+	if err != nil {
+		logger.ErrLogger.Fatal(err)
+	}
+	err = encoder.Encode(rs.St)
+	if err != nil {
+		logger.ErrLogger.Fatal(err)
+	}
+	return w.Bytes(), nil
+}
+
+func (rs *RequestStatus) GobDecode(buf []byte) error {
+	read := bytes.NewBuffer(buf)
+	decoder := gob.NewDecoder(read)
+	err := decoder.Decode(&rs.Req)
+	if err != nil {
+		logger.ErrLogger.Fatal(err)
+	}
+	err = decoder.Decode(&rs.St)
+	if err != nil {
+		logger.ErrLogger.Fatal(err)
+	}
+	return nil
+}
+
 func (rs *RequestStatus) Equals(r *RequestStatus) bool {
 	return rs.Req.Equals(r.Req) && rs.St == r.St
 }
@@ -117,12 +146,18 @@ func (rs *ReplicaStructure) GobDecode(buf []byte) error {
 	if err != nil {
 		logger.ErrLogger.Fatal(err)
 	}
+	logger.OutLogger.Println("Received |pendReqs|=", len(pendReqs))
 	rs.PendReqs = list.New()
 	for _, req := range pendReqs {
 		rs.PendReqs.PushBack(req)
 	}
 	var reqQ []*RequestStatus
 	err = decoder.Decode(&reqQ)
+	if err != nil {
+		logger.ErrLogger.Fatal(err)
+	}
+	logger.OutLogger.Println("Received |reqQ|=", len(reqQ))
+
 	rs.ReqQ = list.New()
 	for _, req := range reqQ {
 		rs.ReqQ.PushBack(req)
@@ -317,9 +352,14 @@ func (rs *ReplicaStructure) Remove(el ...interface{}) {
 	case "*types.AcceptedRequest":
 		for _, element := range el {
 			element := element.(*AcceptedRequest)
+			count := 0
 			for e := rs.ReqQ.Front(); e != nil; e = e.Next() {
-				if e.Value.(*RequestStatus).Req.Equals(element) {
+				if e.Value.(*RequestStatus).Req.Request.Equals(element.Request) {
+					count++
 					rs.ReqQ.Remove(e)
+					if count == 2 {
+						log.Println("ok")
+					}
 				}
 			}
 		}
@@ -354,13 +394,20 @@ func (rs *ReplicaStructure) Add(el ...interface{}) {
 	case "*types.RequestStatus":
 		for _, element := range el {
 			element := element.(*RequestStatus)
-			for e:= rs.ReqQ.Front();e!= nil;e=e.Next(){
-				if e.Value.(*RequestStatus).Equals(element){
+			val := new(RequestStatus)
+			val.St = element.St
+			//*val = *element
+			val.Req = &AcceptedRequest{
+				Request: &Request{Client: element.Req.Request.Client, TimeStamp: element.Req.Request.TimeStamp, Operation: element.Req.Request.Operation},
+				View:    element.Req.View,
+				Sq:      element.Req.Sq,
+			}
+			for e := rs.ReqQ.Front(); e != nil; e = e.Next() {
+				if e.Value.(*RequestStatus).Equals(val) {
 					return
 				}
 			}
-			logger.OutLogger.Println("Setting", element.St ,"to", element.Req)
-			rs.ReqQ.PushBack(element)
+			rs.ReqQ.PushBack(val)
 		}
 		break
 	case "*types.AcceptedRequest":
