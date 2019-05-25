@@ -680,6 +680,7 @@ func ByzantineReplication() {
 		/*
 			Checking for View Change
 		*/
+
 		if !viewChanged() && AllowService() {
 			rep[variables.Id].ViewChanged =
 				(rep[variables.Id] != nil) &&
@@ -741,45 +742,44 @@ func ByzantineReplication() {
 		//Serviceable View and no conflicts
 		if AllowService() && !needFlush {
 			if NoViewChange() && !viewChanged() {
-				if rep[variables.Id].Prim == variables.Id {
-					if config.TestCase != config.BYZANTINE_PRIM && variables.Id == 0 {
-						for req := rep[variables.Id].PendReqs.Front(); req != nil; req = req.Next() {
-							request := req.Value.(*types.Request)
-							isUnassigned := false
-							for _, unassigned := range unassignedReqs() {
-								if unassigned.Equals(request) {
-									isUnassigned = true
-								}
-							}
-							if !isUnassigned {
-								continue
-							}
-							if seqn < lastExec()+Sigma*variables.K {
-								// 3-phase commit Replication
-								//("Seqn=",seqn)
-								if config.TestCase == config.STALE_REQUESTS && variables.Id == 0 {
-									request.Operation.Value = 'l'
-								}
-								reqSt := new(types.RequestStatus)
-								reqSt.Req = new(types.AcceptedRequest)
-								reqSt.Req.Request = request
-								reqSt.Req.View = rep[variables.Id].Prim
-								seqn++
-								reqSt.Req.Sq = seqn
-								reqSt.St = types.PRE_PREP
-								rep[variables.Id].Add(reqSt)
-
-								reqSt = new(types.RequestStatus)
-								reqSt.Req = new(types.AcceptedRequest)
-								reqSt.Req.Request = request
-								reqSt.Req.View = rep[variables.Id].Prim
-								//seqn++
-								reqSt.Req.Sq = seqn
-								reqSt.St = types.PREP
-								rep[variables.Id].Add(reqSt)
+				if (rep[variables.Id].Prim == variables.Id) && !(config.TestCase == config.BYZANTINE_PRIM && variables.Id == 0) {
+					for req := rep[variables.Id].PendReqs.Front(); req != nil; req = req.Next() {
+						request := req.Value.(*types.Request)
+						isUnassigned := false
+						for _, unassigned := range unassignedReqs() {
+							if unassigned.Equals(request) {
+								isUnassigned = true
 							}
 						}
+						if !isUnassigned {
+							continue
+						}
+						if seqn < lastExec()+Sigma*variables.K {
+							// 3-phase commit Replication
+							//("Seqn=",seqn)
+							if config.TestCase == config.STALE_REQUESTS && variables.Id == 0 {
+								request.Operation.Value = 'l'
+							}
+							reqSt := new(types.RequestStatus)
+							reqSt.Req = new(types.AcceptedRequest)
+							reqSt.Req.Request = request
+							reqSt.Req.View = rep[variables.Id].Prim
+							seqn++
+							reqSt.Req.Sq = seqn
+							reqSt.St = types.PRE_PREP
+							rep[variables.Id].Add(reqSt)
+
+							reqSt = new(types.RequestStatus)
+							reqSt.Req = new(types.AcceptedRequest)
+							reqSt.Req.Request = request
+							reqSt.Req.View = rep[variables.Id].Prim
+							//seqn++
+							reqSt.Req.Sq = seqn
+							reqSt.St = types.PREP
+							rep[variables.Id].Add(reqSt)
+						}
 					}
+
 				} else {
 					logger.OutLogger.Println("Accepting Sequence Numbers from Primary.")
 					logger.OutLogger.Println("KnownPendReqs Len=", len(knownPendReqs()))
@@ -953,12 +953,5 @@ func handleRequest(req *types.Request) {
 
 func handleAck(cm *types.ClientMessage) {
 	logger.OutLogger.Println("Ack Received.")
-	//_, err := messenger.ServerSockets[cm.Req.Client].Send("", 0)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//messenger.SendRecvSync[cm.Req.Client] <- struct{}{}
 	rep[variables.Id].Remove(&types.RequestReply{Req: cm.Req, Rep: nil})
-	//log.Println("ReqQ", rep[variables.Id].ReqQ.Len())
-	//log.Println("Sq", rep[variables.Id].ReqQ.Front().Value.(*types.RequestStatus).Req.Sq, "id", variables.Id, "lastExec", lastExec())
 }

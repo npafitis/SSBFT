@@ -2,6 +2,7 @@ package app
 
 import (
 	"SSBFT/app/messenger"
+	"SSBFT/config"
 	"SSBFT/logger"
 	"SSBFT/types"
 	"SSBFT/variables"
@@ -26,6 +27,9 @@ func defState() *types.VCM {
 Interface for View Change
 */
 func NoViewChange() bool {
+	if config.TestCase == config.NON_SS {
+		return true
+	}
 	return vcm[variables.Id].VStatus == types.OK
 }
 
@@ -47,10 +51,14 @@ func ViewChangeMonitor() {
 						set = append(set, i)
 					}
 				}
-				vcm[variables.Id].NeedChgSet = append(vcm[variables.Id].NeedChgSet, set...)
+				for i := range set {
+					vcm[variables.Id].NeedChgSet = types.AppendIfMissingInt(vcm[variables.Id].NeedChgSet, set[i])
+				}
+				//log.Println("needChgSet len",len(vcm[variables.Id].NeedChgSet))
+				//vcm[variables.Id].NeedChgSet = append(vcm[variables.Id].NeedChgSet, set...)
 				noServiceCount := 0
 				for i := range vcm {
-					if vcm[i].VStatus == types.OK {
+					if vcm[i].VStatus == types.NoService {
 						noServiceCount++
 					}
 				}
@@ -93,7 +101,10 @@ func cleanState() {
 }
 
 // TODO check correctness here
-
+/*
+return True if there is a set of processors size x with the same primary, and this set supports a view
+change, and also each member of the set sees an intersection of needChgSet sets of size at least 3f + 1
+*/
 func supChange(x int) bool {
 	for i := 0; i < variables.N; i++ {
 		var set []int
@@ -102,11 +113,15 @@ func supChange(x int) bool {
 				set = append(set, j)
 			}
 		}
-		pop := 0
-		for j := range set {
-			pop += len(vcm[j].NeedChgSet)
+		if len(set) == 0 {
+			continue
 		}
-		if pop >= 3*variables.F+1 && len(set) >= x {
+		var intersection []int
+		intersection = vcm[set[0]].NeedChgSet
+		for _, j := range set {
+			intersection = types.IntersectionInt(intersection, vcm[j].NeedChgSet)
+		}
+		if len(intersection) >= 3*variables.F+1 && len(set) >= x {
 			return true
 		}
 	}

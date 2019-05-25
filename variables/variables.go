@@ -15,6 +15,8 @@ var (
 	T int
 	// Size of Clients Set
 	K int
+
+	Remote bool
 )
 
 func Initialise(id int, n int, t int, k int) {
@@ -26,4 +28,5 @@ func Initialise(id int, n int, t int, k int) {
 	}
 	T = t
 	K = k
+	Remote = false
 }

@@ -10,7 +10,7 @@ var ReqAddresses map[string]int
 var ServerAddresses map[string]int
 var ResponseAddresses map[string]int
 
-func InitialiseIP(n int) {
+func InitialiseLocal(n int) {
 	RepAddresses = make(map[string]int, n)
 	ReqAddresses = make(map[string]int, n)
 	ServerAddresses = make(map[string]int, variables.K)
@@ -25,7 +25,7 @@ func InitialiseIP(n int) {
 	}
 }
 
-func GetRepAddress(id int) string {
+func GetRepAddressLocal(id int) string {
 	for key, value := range RepAddresses {
 		if value == id {
 			return key
@@ -34,7 +34,7 @@ func GetRepAddress(id int) string {
 	return ""
 }
 
-func GetResponseAddress(id int) string {
+func GetResponseAddressLocal(id int) string {
 	for key, value := range ResponseAddresses {
 		if value == id {
 			return key
@@ -42,7 +42,7 @@ func GetResponseAddress(id int) string {
 	}
 	return ""
 }
-func GetServerAddress(id int) string {
+func GetServerAddressLocal(id int) string {
 	for key, value := range ServerAddresses {
 		if value == id {
 			return key
@@ -51,7 +51,7 @@ func GetServerAddress(id int) string {
 	return ""
 }
 
-func GetReqAddress(id int) string {
+func GetReqAddressLocal(id int) string {
 	for key, value := range ReqAddresses {
 		if value == id {
 			return key

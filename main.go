@@ -15,7 +15,8 @@ import (
 func Initialise(id int, n int, t int, k int, scenario config.Scenario) {
 	variables.Initialise(id, n, t, k)
 
-	config.InitialiseIP(n)
+	config.InitialiseLocal(n)
+	config.InitialiseIp(n)
 	config.InitialiseScenario(scenario)
 
 	logger.InitialiseLogger()
@@ -67,10 +68,14 @@ func main() {
 	Initialise(id, n, t, k, scenario)
 	messenger.Subscribe()
 
+	if config.TestCase != config.NON_SS {
+		go app.FailDetector()
+		go app.ViewChangeMonitor()
+		go app.CoordinatingAutomaton()
+
+	}
 	go messenger.TransmitMessages()
-	go app.FailDetector()
 	go app.ByzantineReplication()
-	go app.ViewChangeMonitor()
-	go app.CoordinatingAutomaton()
+
 	_ = <-done
 }

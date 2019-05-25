@@ -2,6 +2,7 @@ package app
 
 import (
 	"SSBFT/app/messenger"
+	"SSBFT/config"
 	"SSBFT/types"
 	"SSBFT/variables"
 	"bytes"
@@ -57,26 +58,27 @@ func reset() {
 
 func FailDetector() {
 	go handleToken()
-	go func() {
-		for {
-			//time.Sleep(time.Second)
-			token := new(types.Token)
-			token.FDSet = 0
-			token.PrimSusp = primSusp[variables.Id]
-			//log.Println("Sending primSusp", token.PrimSusp)
-			message := new(types.Message)
-			w := new(bytes.Buffer)
-			encoder := gob.NewEncoder(w)
-			err := encoder.Encode(token)
-			if err != nil {
-				log.Fatal(err)
-			}
-			message.Payload = w.Bytes()
-			message.Type = "Token"
-			message.From = variables.Id
-			messenger.Broadcast(*message)
+	if config.TestCase == config.BYZANTINE_PRIM && variables.Id == 0 && variables.Prim == variables.Id {
+		return
+	}
+
+	for {
+
+		token := new(types.Token)
+		token.FDSet = 0
+		token.PrimSusp = primSusp[variables.Id]
+		message := new(types.Message)
+		w := new(bytes.Buffer)
+		encoder := gob.NewEncoder(w)
+		err := encoder.Encode(token)
+		if err != nil {
+			log.Fatal(err)
 		}
-	}()
+		message.Payload = w.Bytes()
+		message.Type = "Token"
+		message.From = variables.Id
+		messenger.Broadcast(*message)
+	}
 }
 
 func handleToken() {
@@ -110,14 +112,6 @@ func handleToken() {
 			if j == variables.Prim {
 				isPending := true
 				pendReqs, _ := GetPendReqs()
-				//log.Println("pendReqs", len(pendReqs))
-				//if len(curCheckReq) == 0 {
-				//	log.Println("curCheckReq empty")
-				//	isPending = true
-				//}
-				//loop:
-				//	log.Println("pendReqs", len(pendReqs))
-				//	log.Println("curCheckReq", len(curCheckReq))
 				for _, req := range curCheckReq {
 					pending := false
 					for _, r := range pendReqs {
@@ -127,7 +121,6 @@ func handleToken() {
 						}
 					}
 					if !pending {
-						//log.Println("Hihi")
 						isPending = false
 						break
 					}
@@ -135,14 +128,13 @@ func handleToken() {
 				if len(curCheckReq) == 0 || !isPending {
 					cnt[j], curCheckReq = 0, pendReqs
 				} else {
-					//log.Println("Hi")
 					cnt[variables.Id]++
 				}
 			} else if variables.Prim == GetView(j) {
 				primSusp[j] = token.PrimSusp
 			}
 			for i := range cnt {
-				if i == variables.Prim || i == variables.Id {
+				if i == variables.Prim { // TODO
 					continue
 				}
 				cnt[i] = 0
@@ -157,10 +149,10 @@ func handleToken() {
 						primIsFD = true
 					}
 				}
-				//log.Println("Count",cnt[variables.Id])
 				primSusp[variables.Id] = !primIsFD || cnt[variables.Id] > variables.T // TODO Changed AND with OR
 			}
 		} else if !AllowService() {
+			//log.Println("Reset")
 			reset()
 		}
 	}

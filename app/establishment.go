@@ -1,6 +1,7 @@
 package app
 
 import (
+	"SSBFT/config"
 	"SSBFT/logger"
 	"SSBFT/types"
 	"SSBFT/variables"
@@ -55,11 +56,14 @@ func ResetAll() string {
 
 func ViewChange() {
 	logger.OutLogger.Println("Change View")
-	log.Println("Change View")
+	log.Println("Change View", variables.Id)
 	vChange[variables.Id] = true
 }
 
 func AllowService() bool {
+	if config.TestCase == config.NON_SS {
+		return true
+	}
 	return ((len(sameVSet(vp(variables.Id).Cur, types.ONE)) +
 		len(sameVSet(vp(variables.Id).Cur, types.ZERO))) >= 3*variables.F+1) &&
 		(phase(variables.Id) == types.ZERO && vp(variables.Id).Cur == vp(variables.Id).Next)
@@ -69,6 +73,8 @@ func GetView(j int) int {
 	if j == variables.Id && phase(variables.Id) == 0 && witnessSeen() {
 		if AllowService() {
 			return vp(variables.Id).Cur
+		} else {
+			return -1
 		}
 	}
 	return vp(j).Cur
@@ -84,7 +90,6 @@ func Automaton(t types.Type, p types.Phase, c int) (val bool, action string) {
 				if (v.Next != vp(variables.Id).Next) &&
 					v.Next != vp(variables.Id).Cur &&
 					val {
-					log.Println("HELLO LADIES")
 					return true, "Adopt this View"
 				}
 			}
@@ -98,6 +103,7 @@ func Automaton(t types.Type, p types.Phase, c int) (val bool, action string) {
 		break
 	case t == types.PRED && p == types.ZERO && c == 1:
 		val = vChange[variables.Id] && establishable(types.ZERO, types.Follow)
+		//log.Println("val =",val, "estabishable",establishable(types.ZERO, types.Follow), "vChange", vChange[variables.Id])
 		break
 	case t == types.ACT && p == types.ZERO && c == 1:
 		nextView()
@@ -131,6 +137,7 @@ func Automaton(t types.Type, p types.Phase, c int) (val bool, action string) {
 		val = establishable(p, types.Follow)
 		break
 	case t == types.ACT && p == types.ONE && c == 1:
+		log.Println("Establish Act")
 		if vp(variables.Id).Equals(RstPair()) {
 			ReplicaFlush()
 		}
@@ -250,7 +257,7 @@ func transitSet(j int, ph types.Phase, d types.Mode) []int {
 func transitionCases(j int, vPair types.VPair, ph types.Phase, t types.Mode) bool {
 	switch t {
 	case types.Remain:
-		return vPair.Next == vPair.Cur
+		return vPair.Next == vp(j).Cur
 	case types.Follow:
 		switch ph {
 		case 0:
@@ -273,14 +280,16 @@ func establishable(ph types.Phase, mode types.Mode) bool {
 }
 
 func establish() {
-	log.Println("Hello Ladies")
+	log.Println("Establish View")
 	views[variables.Id].Cur = vp(variables.Id).Next
 }
 
 func nextView() {
+	log.Println("Next View")
 	views[variables.Id].Next = (views[variables.Id].Cur + 1) % variables.N
 }
 
-func resetVChange() {
+func resetVChange() { // TODO Dame eminamen
+	log.Println("Reset vChange")
 	vChange[variables.Id] = false
 }

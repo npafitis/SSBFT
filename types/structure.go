@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"container/list"
 	"encoding/gob"
-	"log"
 	"reflect"
 )
 
@@ -357,9 +356,6 @@ func (rs *ReplicaStructure) Remove(el ...interface{}) {
 				if e.Value.(*RequestStatus).Req.Request.Equals(element.Request) {
 					count++
 					rs.ReqQ.Remove(e)
-					if count == 2 {
-						log.Println("ok")
-					}
 				}
 			}
 		}
@@ -408,6 +404,7 @@ func (rs *ReplicaStructure) Add(el ...interface{}) {
 				}
 			}
 			rs.ReqQ.PushBack(val)
+
 		}
 		break
 	case "*types.AcceptedRequest":

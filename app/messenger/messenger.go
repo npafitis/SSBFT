@@ -77,7 +77,14 @@ func InitialiseMessenger() {
 		if err != nil {
 			logger.ErrLogger.Fatal(err)
 		}
-		serverAddr := config.GetServerAddress(i)
+
+		var serverAddr string
+		if !variables.Remote {
+			serverAddr = config.GetServerAddressLocal(i)
+		} else {
+			serverAddr = config.GetServerAddress(i)
+		}
+
 		err = ServerSockets[i].Bind(serverAddr)
 		if err != nil {
 			logger.ErrLogger.Fatal(err)
@@ -87,7 +94,12 @@ func InitialiseMessenger() {
 		if err != nil {
 			logger.ErrLogger.Fatal(err)
 		}
-		responseAddr := config.GetResponseAddress(i)
+		var responseAddr string
+		if !variables.Remote {
+			responseAddr = config.GetResponseAddressLocal(i)
+		} else {
+			responseAddr = config.GetResponseAddress(i)
+		}
 		err = ResponseSockets[i].Bind(responseAddr)
 		if err != nil {
 			logger.ErrLogger.Fatal(err)
@@ -103,17 +115,27 @@ func InitialiseMessenger() {
 		if err != nil {
 			logger.ErrLogger.Fatal(err)
 		}
-		rcvAddr := strings.Replace(
-			config.GetRepAddress(i),
-			"localhost",
-			"*",
-			1)
+		var rcvAddr string
+		if !variables.Remote {
+			rcvAddr = strings.Replace(
+				config.GetRepAddressLocal(i),
+				"localhost",
+				"*",
+				1)
+		} else {
+			rcvAddr = config.GetRepAddress(i)
+		}
 		err = RcvSockets[i].Bind(rcvAddr)
 		if err != nil {
 			logger.ErrLogger.Fatal(err, " "+rcvAddr)
 		}
 		logger.OutLogger.Println("Binded on ", rcvAddr)
-		sndAddr := config.GetReqAddress(i)
+		var sndAddr string
+		if !variables.Remote {
+			sndAddr = config.GetReqAddressLocal(i)
+		} else {
+			sndAddr = config.GetReqAddress(i)
+		}
 		SndSockets[i], err = Context.NewSocket(zmq4.REQ)
 		if err != nil {
 			logger.ErrLogger.Fatal(err)

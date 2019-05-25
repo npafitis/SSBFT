@@ -2,6 +2,41 @@ package types
 
 type RLog []*LogTuple
 
+func IntersectionInt(s1, s2 []int) (inter []int) {
+	hash := make(map[int]bool)
+	for _, e := range s1 {
+		hash[e] = true
+	}
+	for _, e := range s2 {
+		// If elements present in the hashmap then append intersection list.
+		if hash[e] {
+			inter = append(inter, e)
+		}
+	}
+	//Remove dups from slice.
+	inter = RemoveDupsInt(inter)
+	return
+
+}
+func RemoveDupsInt(elements []int) (nodups []int) {
+	encountered := make(map[int]bool)
+	for _, element := range elements {
+		if !encountered[element] {
+			nodups = append(nodups, element)
+			encountered[element] = true
+		}
+	}
+	return
+}
+
+func AppendIfMissingInt(slice []int, i int) []int {
+	for _, ele := range slice {
+		if ele == i {
+			return slice
+		}
+	}
+	return append(slice, i)
+}
 func AppendIfMissingRequest(slice []*Request, i *Request) []*Request {
 	for _, ele := range slice {
 		if ele.Equals(i) {

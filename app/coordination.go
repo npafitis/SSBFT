@@ -29,18 +29,6 @@ var witnessSet []int
 
 var echo []*types.AutomatonInfo
 
-// Aliases
-//func Wi() []int {
-//	var processorSet []int
-//	processorSet = append(processorSet, variables.Id)
-//	for j := range witnessSet {
-//		if echo[j] == echo[variables.Id] {
-//			processorSet = append(processorSet, variables.Id)
-//		}
-//	}
-//	return processorSet
-//}
-
 /*
 Macros for Coordinating Automaton
 */
@@ -49,12 +37,9 @@ echoNoWitn(k) checks whether the view and phase that
 processor Pk reported about Pi match Pi's view and phase.
 */
 func echoNoWitn(k int) bool {
-	if variables.View == echo[k].View &&
+	return vp(variables.Id).Equals(echo[k].View) &&
 		phs[variables.Id] == echo[k].Phase &&
-		vChange[variables.Id] == echo[k].VChange {
-		return true
-	}
-	return false
+		vChange[variables.Id] == echo[k].VChange
 }
 
 /*
@@ -62,7 +47,8 @@ witnessSeen() is correct when the witnessSet set
 is of size greater than 4f + 1
 */
 func witnessSeen() bool {
-	return witnesses[variables.Id] && len(witnessSet) > 4*variables.F
+	//log.Println(variables.Id, "witnesses[i]", witnesses[variables.Id])
+	return witnesses[variables.Id] && (len(witnessSet)+1) >= 4*variables.F+1
 }
 
 /*
@@ -70,11 +56,7 @@ nextPhs() proceeds the phase from 0 to 1 and from 1 to
 0, also emptying the witnessSet set.
 */
 func nextPhs() {
-	if phs[variables.Id] == 1 {
-		phs[variables.Id] = 0
-	} else {
-		phs[variables.Id] = 1
-	}
+	phs[variables.Id] = (phs[variables.Id] + 1) % 2
 	witnesses[variables.Id] = false
 	witnessSet = make([]int, 0)
 }
@@ -103,7 +85,7 @@ func AutomatonInit() {
 }
 
 func CoordinatingAutomaton() {
-	go handleCoordination()
+	//go handleCoordination()
 	for {
 		if NeedReset() {
 			ResetAll()
@@ -114,36 +96,30 @@ func CoordinatingAutomaton() {
 				count++
 			}
 		}
+		//log.Println("Count", count)
 		witnesses[variables.Id] = count >= 4*variables.F+1
-		var set []int
 		for i := range witnesses {
 			if witnesses[i] {
-				set = append(set, i)
+				witnessSet = types.AppendIfMissingInt(witnessSet, i)
 			}
 		}
-		for i := range set {
-			flag := false
-			for j := range witnessSet {
-				if set[i] == witnessSet[j] {
-					flag = true
-					break
-				}
-			}
-			if !flag {
-				witnessSet = append(witnessSet, set[i])
-			}
-		}
-		//witnessSet = append(witnessSet, set...) //TODO: Check all appends for duplicates in this case is Union
-		if witnessSeen() {
+		witnesSeen := witnessSeen()
+		//log.Println("id",variables.Id,"vChange", vChange[variables.Id], "witnesSeen", witnesSeen, "|witnesSet|", len(witnessSet))
+		if witnesSeen {
+			// TODO Dame kati pezei
 			c := 0
 			automaton, _ := Automaton(types.PRED, phase(variables.Id), c)
 
-			for !automaton || AutoMaxCase(phase(variables.Id)) >= c {
+			for !automaton && AutoMaxCase(phase(variables.Id)) >= c {
 				c++
 				automaton, _ = Automaton(types.PRED, phase(variables.Id), c)
 			}
 			if AutoMaxCase(phase(variables.Id)) >= c {
-				_, _ = Automaton(types.ACT, phase(variables.Id), c)
+				_, ret := Automaton(types.ACT, phase(variables.Id), c)
+
+				if ret != "No Action" && ret != "Reset" {
+					nextPhs()
+				}
 			}
 		}
 		for i := 0; i < variables.N; i++ {
@@ -168,26 +144,29 @@ func CoordinatingAutomaton() {
 				logger.ErrLogger.Fatal(err)
 			}
 			message := types.Message{Payload: w.Bytes(), Type: "CoordinationMessage", From: variables.Id}
+			//log.Println("Processor", variables.Id, "sending coordination to", i, "Message", this)
 			messenger.SendMessage(message, i)
 		}
+		handleCoordination()
 	}
 }
 
 func handleCoordination() {
-	for {
-		message := <-messenger.CoordChan
-		if valid(message.Message, message.From) {
-			phs[message.From] = message.Message.Phase
-			witnesses[message.From] = message.Message.Witness
-			echo[message.From] = &types.AutomatonInfo{
-				Phase:   message.Message.Phase,
-				Witness: message.Message.Witness,
-				View:    message.Message.ViewVChange.View.Cur,
-				VChange: message.Message.ViewVChange.ViewChange,
-			}
-			SetInfo(message.Message, message.From)
+	//for {
+	message := <-messenger.CoordChan
+	if valid(message.Message, message.From) {
+		phs[message.From] = message.Message.Phase
+		witnesses[message.From] = message.Message.Witness
+		echo[message.From] = &types.AutomatonInfo{
+			Phase:   message.Message.Phase,
+			Witness: message.Message.Witness,
+			View:    message.Message.ViewVChange.View,
+			VChange: message.Message.ViewVChange.ViewChange,
 		}
+		SetInfo(message.Message, message.From)
+
 	}
+	//}
 }
 
 func InitializeAutomaton() {
@@ -195,7 +174,11 @@ func InitializeAutomaton() {
 	witnesses = make([]bool, variables.N)
 	echo = make([]*types.AutomatonInfo, variables.N)
 	for i := range echo {
-		echo[i] = &types.AutomatonInfo{View: 0, Phase: types.ZERO, VChange: false, Witness: false}
+		echo[i] = &types.AutomatonInfo{
+			View:    types.VPair{Cur: 0, Next: 1},
+			Phase:   types.ZERO,
+			VChange: false,
+			Witness: false}
 	}
 	witnessSet = make([]int, 0)
 }

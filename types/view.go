@@ -1,21 +1,14 @@
 package types
 
-import (
-	"SSBFT/logger"
-	"bytes"
-	"encoding/gob"
-)
-
 type Phase int
 
 const (
-	ZERO Phase = 0
-	ONE  Phase = 1
+	ZERO Phase = iota
+	ONE
 )
 
-
 type AutomatonInfo struct {
-	View    int
+	View    VPair
 	Phase   Phase
 	VChange bool
 	Witness bool
@@ -26,33 +19,33 @@ type VPair struct {
 	Next int
 }
 
-func (vp VPair) GobEncode() ([]byte, error) {
-	w := new(bytes.Buffer)
-	encoder := gob.NewEncoder(w)
-	err := encoder.Encode(vp.Cur)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	err = encoder.Encode(vp.Next)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	return w.Bytes(), nil
-}
-
-func (vp *VPair) GobDecode(buf []byte) error {
-	r := bytes.NewBuffer(buf)
-	decoder := gob.NewDecoder(r)
-	err := decoder.Decode(&vp.Cur)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	err = decoder.Decode(&vp.Next)
-	if err != nil {
-		logger.ErrLogger.Fatal(err)
-	}
-	return nil
-}
+//func (vp VPair) GobEncode() ([]byte, error) {
+//	w := new(bytes.Buffer)
+//	encoder := gob.NewEncoder(w)
+//	err := encoder.Encode(vp.Cur)
+//	if err != nil {
+//		logger.ErrLogger.Fatal(err)
+//	}
+//	err = encoder.Encode(vp.Next)
+//	if err != nil {
+//		logger.ErrLogger.Fatal(err)
+//	}
+//	return w.Bytes(), nil
+//}
+//
+//func (vp *VPair) GobDecode(buf []byte) error {
+//	r := bytes.NewBuffer(buf)
+//	decoder := gob.NewDecoder(r)
+//	err := decoder.Decode(&vp.Cur)
+//	if err != nil {
+//		logger.ErrLogger.Fatal(err)
+//	}
+//	err = decoder.Decode(&vp.Next)
+//	if err != nil {
+//		logger.ErrLogger.Fatal(err)
+//	}
+//	return nil
+//}
 
 func (vp VPair) Equals(pair VPair) bool {
 	return vp.Cur == pair.Cur && vp.Next == pair.Next
@@ -77,7 +70,8 @@ type ViewVChange struct {
 	ViewChange bool
 }
 
-//func (vv *ViewVChange) GobEncoder() ([]byte, error) {
+//
+//func (vv ViewVChange) GobEncoder() ([]byte, error) {
 //	w := new(bytes.Buffer)
 //	encoder := gob.NewEncoder(w)
 //	err := encoder.Encode(vv.View)
@@ -94,7 +88,7 @@ type ViewVChange struct {
 //func (vv *ViewVChange) GobDecode(buf []byte) error {
 //	r := bytes.NewBuffer(buf)
 //	decoder := gob.NewDecoder(r)
-//	err := decoder.Decode(vv.View)
+//	err := decoder.Decode(&vv.View)
 //	if err != nil {
 //		logger.ErrLogger.Fatal(err)
 //	}
