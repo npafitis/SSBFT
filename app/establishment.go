@@ -26,7 +26,7 @@ Constants for View Establishment
 //TODO [ ]: values might not be correct
 const DF_VIEW_CUR int = 0
 
-const DF_VIEW_NEXT = 1
+const DF_VIEW_NEXT = 0
 
 func RstPair() types.VPair {
 	return types.VPair{Cur: DF_VIEW_CUR, Next: DF_VIEW_NEXT}
@@ -56,7 +56,7 @@ func ResetAll() string {
 
 func ViewChange() {
 	logger.OutLogger.Println("Change View")
-	log.Println("Change View", variables.Id)
+	//log.Println("Change View", variables.Id)
 	vChange[variables.Id] = true
 }
 
@@ -64,8 +64,8 @@ func AllowService() bool {
 	if config.TestCase == config.NON_SS {
 		return true
 	}
-	return ((len(sameVSet(vp(variables.Id).Cur, types.ONE)) +
-		len(sameVSet(vp(variables.Id).Cur, types.ZERO))) >= 3*variables.F+1) &&
+	return ((len(sameVSet(vp(variables.Id), types.ONE)) +
+		len(sameVSet(vp(variables.Id), types.ZERO))) >= 3*variables.F+1) &&
 		(phase(variables.Id) == types.ZERO && vp(variables.Id).Cur == vp(variables.Id).Next)
 }
 
@@ -102,8 +102,8 @@ func Automaton(t types.Type, p types.Phase, c int) (val bool, action string) {
 		nextPhs()
 		break
 	case t == types.PRED && p == types.ZERO && c == 1:
-		val = vChange[variables.Id] && establishable(types.ZERO, types.Follow)
-		//log.Println("val =",val, "estabishable",establishable(types.ZERO, types.Follow), "vChange", vChange[variables.Id])
+		val = changeable() || (establishable(types.ZERO, types.Follow) && vChange[variables.Id])
+		log.Println("ID:", variables.Id, "changeable", changeable(), "establishable", establishable(types.ZERO, types.Follow) && vChange[variables.Id])
 		break
 	case t == types.ACT && p == types.ZERO && c == 1:
 		nextView()
@@ -194,9 +194,9 @@ func legitPhsOne(vp types.VPair) bool {
 }
 
 func typeCheck(vp types.VPair) bool {
-	return vp.Cur >= 0 && vp.Cur < variables.N &&
-		vp.Next >= 0 && vp.Next < variables.N &&
-		vp.Next != -1 && vp.Cur != -1
+	return ((vp.Cur >= 0 && vp.Cur < variables.N) || vp.Cur == -1) &&
+		((vp.Next >= 0 && vp.Next < variables.N) || vp.Cur == -1)
+	// && vp.Next != -1 && vp.Cur != -1
 }
 
 func staleV(k int) bool {
@@ -209,10 +209,10 @@ func valid(m *types.CoordinationMessage, k int) bool {
 		(m.Phase == 1 && legitPhsOne(m.Views[k]))
 }
 
-func sameVSet(j int, ph types.Phase) []int {
+func sameVSet(j types.VPair, ph types.Phase) []int {
 	var processorSet []int
 	for i := 0; i < variables.N; i++ {
-		if phase(i) == ph && vp(i).Equals(vp(j)) && !staleV(i) {
+		if phase(i) == ph && vp(i).Equals(j) && !staleV(i) {
 			processorSet = append(processorSet, i)
 		}
 	}
@@ -240,14 +240,14 @@ func mergeSets(arr1 []int, arr2 []int) []int {
 }
 
 func transitAdopble(j int, ph types.Phase, d types.Mode) bool {
-	var set = mergeSets(sameVSet(j, ph), transitSet(j, ph, d))
+	var set = mergeSets(sameVSet(vp(j), ph), transitSet(j, ph, d))
 	return len(set) >= 3*variables.F+1
 }
 
 func transitSet(j int, ph types.Phase, d types.Mode) []int {
 	var set = make([]int, 0)
 	for i := 0; i < variables.N; i++ {
-		if phase(i) == ph && transitionCases(j, vp(i), ph, d) && !staleV(i) {
+		if phase(i) != ph && transitionCases(j, vp(i), ph, d) && !staleV(i) {
 			set = append(set, i)
 		}
 	}
@@ -275,21 +275,37 @@ func adopt(vPair types.VPair) {
 
 //TODO [ ]: *vp(types.Id).Cur might not be correct
 func establishable(ph types.Phase, mode types.Mode) bool {
-	return (len(sameVSet(vp(variables.Id).Cur, phase(variables.Id))) +
+	return (len(sameVSet(vp(variables.Id), phase(variables.Id))) +
 		len(transitSet(variables.Id, ph, mode))) >= 4*variables.F+1
 }
 
+func changeable() bool {
+	setZero := make([]int, 0)
+	setOne := make([]int, 0)
+	for k := 0; k < variables.N; k++ {
+		if phase(k) == types.ZERO &&
+			vChange[k] == true &&
+			vp(k).Equals(vp(variables.Id)) {
+			setZero = types.AppendIfMissingInt(setZero, k)
+		} else if phase(k) == types.ONE &&
+			views[k].Next == (views[k].Cur+1)%variables.N {
+			setOne = types.AppendIfMissingInt(setOne, k)
+		}
+	}
+	return len(setZero)+len(setOne) >= 4*variables.F+1
+}
+
 func establish() {
-	log.Println("Establish View")
+	log.Println("ID:", variables.Id, "Establish View")
 	views[variables.Id].Cur = vp(variables.Id).Next
 }
 
 func nextView() {
-	log.Println("Next View")
+	log.Println("ID:", variables.Id, "Next View")
 	views[variables.Id].Next = (views[variables.Id].Cur + 1) % variables.N
 }
 
 func resetVChange() { // TODO Dame eminamen
-	log.Println("Reset vChange")
+	log.Println("ID:", variables.Id, "Reset vChange")
 	vChange[variables.Id] = false
 }

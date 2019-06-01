@@ -7,22 +7,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5c5ff8f8-300f-41d5-adac-1fdbb0ed5311" name="Default Changelist" comment="Final touches">
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/nikolas.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/nikolas.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/coordination.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/coordination.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/establishment.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/establishment.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/faildetect.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/faildetect.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/messenger/messenger.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/messenger/messenger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/replication.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/replication.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/viewchange.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/viewchange.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/local.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/local.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/planetlab.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/ip.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/coordination.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/coordination.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/slice_helper.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/slice_helper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/structure.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/structure.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/view.go" beforeDir="false" afterPath="$PROJECT_DIR$/types/view.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/variables/variables.go" beforeDir="false" afterPath="$PROJECT_DIR$/variables/variables.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -50,10 +37,22 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/replication.go">
+        <entry file="file://$PROJECT_DIR$/app/coordination.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="383">
-              <caret line="683" column="45" lean-forward="true" selection-start-line="683" selection-start-column="45" selection-end-line="683" selection-end-column="45" />
+            <state relative-caret-position="225">
+              <caret line="58" column="16" lean-forward="true" selection-start-line="58" selection-start-column="16" selection-end-line="58" selection-end-column="16" />
+              <folding>
+                <element signature="e#13#121#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="5" selection-start-column="5" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -61,26 +60,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/viewchange.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="365">
-              <caret line="30" column="19" selection-start-line="30" selection-start-column="19" selection-end-line="30" selection-end-column="19" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/coordination.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="581">
-              <caret line="105" column="29" selection-start-line="105" selection-start-column="29" selection-end-line="105" selection-end-column="29" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/types/view.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="252">
-              <caret line="9" selection-start-line="9" selection-end-line="9" />
+            <state>
+              <caret line="112" column="4" selection-start-line="112" selection-start-column="4" selection-end-line="112" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -88,26 +69,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/establishment.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="309">
-              <caret line="61" selection-start-line="61" selection-end-line="61" />
+            <state relative-caret-position="1163">
+              <caret line="298" column="35" selection-start-line="298" selection-start-column="35" selection-end-line="298" selection-end-column="35" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.go">
+        <entry file="file://$PROJECT_DIR$/app/replication.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="784">
-              <caret line="77" column="23" selection-start-line="77" selection-start-column="23" selection-end-line="77" selection-end-column="23" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/config/scenario.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="224">
-              <caret line="8" column="18" selection-start-line="8" selection-start-column="18" selection-end-line="8" selection-end-column="18" />
+            <state relative-caret-position="166">
+              <caret line="659" column="1" selection-start-line="659" selection-start-column="1" selection-end-line="659" selection-end-column="1" />
             </state>
           </provider>
         </entry>
@@ -117,6 +89,15 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="318">
               <caret line="58" column="5" selection-start-line="58" selection-start-column="5" selection-end-line="58" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/types/view.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="168">
+              <caret line="6" column="4" selection-start-line="6" selection-start-column="4" selection-end-line="6" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -133,10 +114,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>nextV</find>
-      <find>Change Vi</find>
-      <find>AllowService</find>
-      <find>Establish</find>
       <find>suspecte</find>
       <find>Establish Nex</find>
       <find>AllowServ</find>
@@ -161,8 +138,12 @@
       <find>-1</find>
       <find>val=</find>
       <find>&quot;va</find>
-      <find>Change View</find>
       <find>ViewChange</find>
+      <find>Change View</find>
+      <find>echo</find>
+      <find>RstP</find>
+      <find>1</find>
+      <find>AutomatonInit</find>
     </findStrings>
     <replaceStrings>
       <replace>(common.id)</replace>
@@ -231,13 +212,13 @@
         <option value="$PROJECT_DIR$/types/coordination.go" />
         <option value="$PROJECT_DIR$/types/slice_helper.go" />
         <option value="$PROJECT_DIR$/types/structure.go" />
-        <option value="$PROJECT_DIR$/app/coordination.go" />
         <option value="$PROJECT_DIR$/types/view.go" />
         <option value="$PROJECT_DIR$/app/faildetect.go" />
         <option value="$PROJECT_DIR$/main.go" />
-        <option value="$PROJECT_DIR$/app/establishment.go" />
         <option value="$PROJECT_DIR$/app/viewchange.go" />
         <option value="$PROJECT_DIR$/app/replication.go" />
+        <option value="$PROJECT_DIR$/app/coordination.go" />
+        <option value="$PROJECT_DIR$/app/establishment.go" />
       </list>
     </option>
   </component>
@@ -265,11 +246,6 @@
               <item name="SSBFT" type="b2602c69:ProjectViewProjectNode" />
               <item name="SSBFT" type="462c0819:PsiDirectoryNode" />
               <item name="app" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SSBFT" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SSBFT" type="462c0819:PsiDirectoryNode" />
-              <item name="config" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -408,10 +384,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1985" y="-4" width="1855" height="1084" extended-state="6" />
+    <frame x="65" y="-4" width="1301" height="772" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49925262" visible="true" weight="0.116639026" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49925262" visible="true" weight="0.121115535" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" sideWeight="0.5007474" side_tool="true" weight="0.13705179" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -594,13 +570,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="6" selection-start-column="6" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/local/go/src/builtin/builtin.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="318">
@@ -722,24 +691,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/coordination.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="581">
-          <caret line="105" column="29" selection-start-line="105" selection-start-column="29" selection-end-line="105" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config/scenario.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="224">
           <caret line="8" column="18" selection-start-line="8" selection-start-column="18" selection-end-line="8" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/faildetect.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="318">
-          <caret line="58" column="5" selection-start-line="58" selection-start-column="5" selection-end-line="58" selection-end-column="5" />
         </state>
       </provider>
     </entry>
@@ -750,31 +705,55 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/types/view.go">
+    <entry file="file://$PROJECT_DIR$/app/replication.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        <state relative-caret-position="166">
+          <caret line="659" column="1" selection-start-line="659" selection-start-column="1" selection-end-line="659" selection-end-column="1" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/establishment.go">
+    <entry file="file://$PROJECT_DIR$/types/view.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="61" selection-start-line="61" selection-end-line="61" />
+        <state relative-caret-position="168">
+          <caret line="6" column="4" selection-start-line="6" selection-start-column="4" selection-end-line="6" selection-end-column="4" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/viewchange.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="365">
-          <caret line="30" column="19" selection-start-line="30" selection-start-column="19" selection-end-line="30" selection-end-column="19" />
+        <state>
+          <caret line="112" column="4" selection-start-line="112" selection-start-column="4" selection-end-line="112" selection-end-column="4" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/replication.go">
+    <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="383">
-          <caret line="683" column="45" lean-forward="true" selection-start-line="683" selection-start-column="45" selection-end-line="683" selection-end-column="45" />
+        <state>
+          <caret column="5" selection-start-column="5" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/establishment.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1163">
+          <caret line="298" column="35" selection-start-line="298" selection-start-column="35" selection-end-line="298" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/faildetect.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="318">
+          <caret line="58" column="5" selection-start-line="58" selection-start-column="5" selection-end-line="58" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/coordination.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="58" column="16" lean-forward="true" selection-start-line="58" selection-start-column="16" selection-end-line="58" selection-end-column="16" />
+          <folding>
+            <element signature="e#13#121#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

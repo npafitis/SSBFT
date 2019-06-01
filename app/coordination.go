@@ -7,6 +7,7 @@ import (
 	"SSBFT/variables"
 	"bytes"
 	"encoding/gob"
+	"log"
 )
 
 /**
@@ -48,7 +49,7 @@ is of size greater than 4f + 1
 */
 func witnessSeen() bool {
 	//log.Println(variables.Id, "witnesses[i]", witnesses[variables.Id])
-	return witnesses[variables.Id] && (len(witnessSet)+1) >= 4*variables.F+1
+	return witnesses[variables.Id] && len(witnessSet) >= 4*variables.F+1
 }
 
 /*
@@ -56,6 +57,7 @@ nextPhs() proceeds the phase from 0 to 1 and from 1 to
 0, also emptying the witnessSet set.
 */
 func nextPhs() {
+	log.Println("ID:", variables.Id, "Next Phase")
 	phs[variables.Id] = (phs[variables.Id] + 1) % 2
 	witnesses[variables.Id] = false
 	witnessSet = make([]int, 0)
@@ -85,13 +87,16 @@ func AutomatonInit() {
 }
 
 func CoordinatingAutomaton() {
-	//go handleCoordination()
+	go handleCoordination()
 	for {
 		if NeedReset() {
 			ResetAll()
 		}
-		count := 0
+		count := 1
 		for i := 0; i < variables.N; i++ {
+			if i == variables.Id {
+				continue
+			}
 			if echoNoWitn(i) {
 				count++
 			}
@@ -117,7 +122,7 @@ func CoordinatingAutomaton() {
 			if AutoMaxCase(phase(variables.Id)) >= c {
 				_, ret := Automaton(types.ACT, phase(variables.Id), c)
 
-				if ret != "No Action" && ret != "Reset" {
+				if ret != "No Action" && ret != "Reset" && ret != "" {
 					nextPhs()
 				}
 			}
@@ -147,26 +152,26 @@ func CoordinatingAutomaton() {
 			//log.Println("Processor", variables.Id, "sending coordination to", i, "Message", this)
 			messenger.SendMessage(message, i)
 		}
-		handleCoordination()
+		//handleCoordination()
 	}
 }
 
 func handleCoordination() {
-	//for {
-	message := <-messenger.CoordChan
-	if valid(message.Message, message.From) {
-		phs[message.From] = message.Message.Phase
-		witnesses[message.From] = message.Message.Witness
-		echo[message.From] = &types.AutomatonInfo{
-			Phase:   message.Message.Phase,
-			Witness: message.Message.Witness,
-			View:    message.Message.ViewVChange.View,
-			VChange: message.Message.ViewVChange.ViewChange,
-		}
-		SetInfo(message.Message, message.From)
+	for {
+		message := <-messenger.CoordChan
+		if valid(message.Message, message.From) {
+			phs[message.From] = message.Message.Phase
+			witnesses[message.From] = message.Message.Witness
+			echo[message.From] = &types.AutomatonInfo{
+				Phase:   message.Message.LastReport.Phase,
+				Witness: message.Message.LastReport.Witness,
+				View:    message.Message.LastReport.Pair.View,
+				VChange: message.Message.LastReport.Pair.ViewChange,
+			}
+			SetInfo(message.Message, message.From)
 
+		}
 	}
-	//}
 }
 
 func InitializeAutomaton() {
@@ -175,7 +180,7 @@ func InitializeAutomaton() {
 	echo = make([]*types.AutomatonInfo, variables.N)
 	for i := range echo {
 		echo[i] = &types.AutomatonInfo{
-			View:    types.VPair{Cur: 0, Next: 1},
+			View:    types.VPair{Cur: 0, Next: 0},
 			Phase:   types.ZERO,
 			VChange: false,
 			Witness: false}
