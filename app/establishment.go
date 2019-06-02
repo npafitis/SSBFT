@@ -97,13 +97,14 @@ func Automaton(t types.Type, p types.Phase, c int) (val bool, action string) {
 		return false, ""
 
 	case t == types.ACT && p == types.ZERO && c == 0:
+		//log.Println("ID:", variables.Id, "Adopt View")
 		adopt(vp(variables.Id))
 		resetVChange()
 		nextPhs()
 		break
 	case t == types.PRED && p == types.ZERO && c == 1:
-		val = changeable() || (establishable(types.ZERO, types.Follow) && vChange[variables.Id])
-		log.Println("ID:", variables.Id, "changeable", changeable(), "establishable", establishable(types.ZERO, types.Follow) && vChange[variables.Id])
+		val = changeable() && (establishable(types.ZERO, types.Follow) && vChange[variables.Id])
+		//log.Println("ID:", variables.Id, "changeable", changeable(), "establishable", establishable(types.ZERO, types.Follow) && vChange[variables.Id])
 		break
 	case t == types.ACT && p == types.ZERO && c == 1:
 		nextView()
@@ -114,12 +115,14 @@ func Automaton(t types.Type, p types.Phase, c int) (val bool, action string) {
 		val = transitAdopble(variables.Id, types.ZERO, types.Remain) || vp(variables.Id).Equals(RstPair())
 		break
 	case t == types.ACT && p == types.ZERO && c == 2:
+		//log.Println("ID:",variables.Id,"No Action Phase Zero")
 		action = "No Action"
 		break
 	case t == types.PRED && p == types.ZERO && c == 3:
 		val = true
 		break
 	case t == types.ACT && p == types.ZERO && c == 3:
+		//log.Println("ID:", variables.Id, "Reset All Phase Zero")
 		action = ResetAll()
 		resetVChange()
 		break
@@ -135,9 +138,10 @@ func Automaton(t types.Type, p types.Phase, c int) (val bool, action string) {
 		break
 	case t == types.PRED && p == types.ONE && c == 1:
 		val = establishable(p, types.Follow)
+		//log.Println("ID:", variables.Id, "establish view pred", val)
 		break
 	case t == types.ACT && p == types.ONE && c == 1:
-		log.Println("Establish Act")
+		log.Println("ID:", variables.Id, "Establish Act")
 		if vp(variables.Id).Equals(RstPair()) {
 			ReplicaFlush()
 		}
@@ -149,12 +153,14 @@ func Automaton(t types.Type, p types.Phase, c int) (val bool, action string) {
 		val = transitAdopble(variables.Id, p, types.Remain)
 		break
 	case t == types.ACT && p == types.ONE && c == 2:
+		//log.Println("ID:", variables.Id, "No Action Phase One")
 		action = "No Action"
 		break
 	case t == types.PRED && p == types.ONE && c == 3:
 		val = true
 		break
 	case t == types.ACT && p == types.ONE && c == 3:
+		//log.Println("ID:", variables.Id, "Reset All Phase One")
 		action = ResetAll()
 		resetVChange()
 		break
@@ -230,12 +236,18 @@ func setContains(arr []int, k int) bool {
 
 //Helper functon Not part of algorithm
 func mergeSets(arr1 []int, arr2 []int) []int {
-	var set = append([]int(nil), arr1...)
-	for _, el := range arr2 {
-		if !setContains(arr1, el) {
-			set = append(set, el)
-		}
+	var set []int
+	copy(arr1, set)
+	for i := range arr2 {
+		set = types.AppendIfMissingInt(set, arr2[i])
 	}
+	//set := make([]int, 0)
+	//set = append(set, arr1...)
+	//for _, el := range arr2 {
+	//	if !setContains(arr1, el) {
+	//		set = append(set, el)
+	//	}
+	//}
 	return set
 }
 
@@ -273,10 +285,12 @@ func adopt(vPair types.VPair) {
 	views[variables.Id].Next = vPair.Cur
 }
 
-//TODO [ ]: *vp(types.Id).Cur might not be correct
 func establishable(ph types.Phase, mode types.Mode) bool {
-	return (len(sameVSet(vp(variables.Id), phase(variables.Id))) +
-		len(transitSet(variables.Id, ph, mode))) >= 4*variables.F+1
+	vSet := sameVSet(vp(variables.Id), phase(variables.Id))
+	tranSet := transitSet(variables.Id, ph, mode)
+	//log.Println("ID:",variables.Id,"vSet", vSet)
+	//log.Println("ID:",variables.Id,"tranSet", tranSet)
+	return len(vSet)+len(tranSet) >= 4*variables.F+1
 }
 
 func changeable() bool {
@@ -296,16 +310,17 @@ func changeable() bool {
 }
 
 func establish() {
+	logger.OutLogger.Println("Establish View")
 	log.Println("ID:", variables.Id, "Establish View")
 	views[variables.Id].Cur = vp(variables.Id).Next
 }
 
 func nextView() {
-	log.Println("ID:", variables.Id, "Next View")
+	//log.Println("ID:", variables.Id, "Next View")
 	views[variables.Id].Next = (views[variables.Id].Cur + 1) % variables.N
 }
 
-func resetVChange() { // TODO Dame eminamen
-	log.Println("ID:", variables.Id, "Reset vChange")
+func resetVChange() {
+	//log.Println("ID:", variables.Id, "Reset vChange")
 	vChange[variables.Id] = false
 }

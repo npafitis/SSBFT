@@ -53,6 +53,8 @@ var (
 		Rep  *types.ReplicaStructure
 		From int
 	}, 100)
+
+	count = 0
 )
 
 func InitialiseMessenger() {
@@ -278,6 +280,8 @@ func ReplyClient(reply *types.Reply) {
 }
 
 func handleMessage(msg []byte) {
+	count++
+	logger.OutLogger.Println("Message Count", count)
 	message := new(types.Message)
 	buffer := bytes.NewBuffer([]byte(msg))
 	decoder := gob.NewDecoder(buffer)

@@ -7,7 +7,6 @@ import (
 	"SSBFT/variables"
 	"bytes"
 	"encoding/gob"
-	"log"
 )
 
 /**
@@ -57,7 +56,7 @@ nextPhs() proceeds the phase from 0 to 1 and from 1 to
 0, also emptying the witnessSet set.
 */
 func nextPhs() {
-	log.Println("ID:", variables.Id, "Next Phase")
+	//log.Println("ID:", variables.Id, "Next Phase")
 	phs[variables.Id] = (phs[variables.Id] + 1) % 2
 	witnesses[variables.Id] = false
 	witnessSet = make([]int, 0)
@@ -89,6 +88,9 @@ func AutomatonInit() {
 func CoordinatingAutomaton() {
 	go handleCoordination()
 	for {
+		//log.Println("ID:",variables.Id,"Views", vp(variables.Id))
+		//log.Println("ID:",variables.Id,"Phase", phase(variables.Id))
+		//log.Println("ID:",variables.Id,"View Change", vChange[variables.Id])
 		if NeedReset() {
 			ResetAll()
 		}
@@ -97,11 +99,14 @@ func CoordinatingAutomaton() {
 			if i == variables.Id {
 				continue
 			}
+			//log.Println(variables.Id, i, "Views", vp(variables.Id), echo[i].View, )
+			//log.Println(variables.Id, i, "Phases", phase(variables.Id), echo[i].Phase)
+			//log.Println(variables.Id, i, "View Change", vChange[variables.Id], echo[i].VChange)
 			if echoNoWitn(i) {
 				count++
 			}
 		}
-		//log.Println("Count", count)
+		//log.Println("ID:", variables.Id, "Count", count)
 		witnesses[variables.Id] = count >= 4*variables.F+1
 		for i := range witnesses {
 			if witnesses[i] {
@@ -162,6 +167,7 @@ func handleCoordination() {
 		if valid(message.Message, message.From) {
 			phs[message.From] = message.Message.Phase
 			witnesses[message.From] = message.Message.Witness
+			vChange[message.From] = message.Message.ViewVChange.ViewChange
 			echo[message.From] = &types.AutomatonInfo{
 				Phase:   message.Message.LastReport.Phase,
 				Witness: message.Message.LastReport.Witness,

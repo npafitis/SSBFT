@@ -701,7 +701,7 @@ func ByzantineReplication() {
 				renewReqs()
 				rep[variables.Id].ViewChanged = false
 			}
-		} else if viewChanged() &&
+		} else if viewChanged() && rep[variables.Id].Prim != -1 &&
 			rep[rep[variables.Id].Prim].ViewChanged == rep[variables.Id].ViewChanged &&
 			rep[rep[variables.Id].Prim].Prim == rep[variables.Id].Prim &&
 			checkNewVState(rep[variables.Id].Prim) &&
